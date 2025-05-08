@@ -1,0 +1,16 @@
+project_name : day-02-SeqAn
+author: "Hang Mai Anh Vo, Baptiste Roizard"
+date: 2025.05.08
+
+ref: "../../data/reference/reference.fa"
+input_dir: "../../data/fastq/tiny"
+output_dir_path: "../results"
+create_input_tsv: false
+
+samples: "../config/samples.tsv"
+
+##### BOWTIE2 PARAMS #####
+threads: 4
+bowtie_threads: 4
+N_penalty: 1
+ref_gap_penalty: '5,3' # Don't write as '5, 3' (notice the space)

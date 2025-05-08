@@ -1,0 +1,32 @@
+import os
+from pathlib import Path
+
+INPUT_DIR = "../data/sam/tiny"  # Change your input directory here
+OUTPUT_DIR = "../day-01"                # Change your output directory here
+SAM_DIR = Path(INPUT_DIR)
+SAMPLES = [f[:-4] for f in os.listdir(SAM_DIR) if os.path.isfile(os.path.join(SAM_DIR, f))]
+
+rule all:
+    input:
+        expand(f"{OUTPUT_DIR}/results/stats/{{sample}}_sorted.txt", sample=SAMPLES, output_dir=OUTPUT_DIR),
+        expand(f"{OUTPUT_DIR}/results/bam_sorted/{{sample}}_sorted.bam.bai", sample=SAMPLES)
+
+rule sam_to_bam:
+    input: f"{INPUT_DIR}/{{sample}}.sam"
+    output: f"{OUTPUT_DIR}/results/bam/{{sample}}.bam"
+    shell: "samtools view -bS {input} > {output}"
+
+rule sort_bam:
+    input: "{output_dir}/results/bam/{sample}.bam"
+    output: "{output_dir}/results/bam_sorted/{sample}_sorted.bam"
+    shell: "samtools sort {input} > {output}"
+
+rule index_bam:
+    input: "{output_dir}/results/bam_sorted/{sample}_sorted.bam"
+    output: "{output_dir}/results/bam_sorted/{sample}_sorted.bam.bai"
+    shell: "samtools index {input} {output}"
+
+rule stats_bam:
+    input: "{output_dir}/results/bam_sorted/{sample}_sorted.bam"
+    output: "{output_dir}/results/stats/{sample}_sorted.txt"
+    shell: "samtools idxstats {input} > {output}"

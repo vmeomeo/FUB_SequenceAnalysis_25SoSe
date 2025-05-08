@@ -1,0 +1,46 @@
+### Data
+data/
+
+### Day 01
+
+# Snakemake cache and logs
+day-01/.snakemake/
+
+# Output
+day-01/results/
+
+### Day 02
+
+# Snakemake cache and logs
+day-02/workflow/.snakemake/
+
+# Archive
+day-02/archive/
+
+# Output directories
+results/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Jupyter and notebooks
+.ipynb_checkpoints/
+
+# IDEs and editors
+.vscode/
+*.code-workspace
+.idea/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Environment folders
+.env/
+.venv/

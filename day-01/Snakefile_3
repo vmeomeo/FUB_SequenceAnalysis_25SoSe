@@ -1,0 +1,25 @@
+SAMPLES = ['ERR024605_tiny', 
+           'ERR024608_tiny',
+           'ERR024607_tiny',
+           'ERR024604_tiny',
+           'ERR024609_tiny',
+           'ERR024606_tiny']
+
+rule all:
+    input:
+        expand("../day-01/results/bam sorted/{sample}_sorted.bai", sample=SAMPLES)
+
+rule sam_to_bam:
+    input: "../data/sam/tiny/{sample}.sam"
+    output: "../day-01/results/bam/{sample}.bam"
+    shell: "samtools view -bS {input} > {output}"
+
+rule sort_bam:
+    input: "../day-01/results/bam/{sample}.bam"
+    output: "../day-01/results/bam sorted/{sample}_sorted.bam"
+    shell: "samtools sort {input} > {output}"
+
+rule index_bam:
+    input: "../day-01/results/bam sorted/{sample}_sorted.bam"
+    output: "../day-01/results/bam sorted/{sample}_sorted.bai"
+    shell: "samtools index {input} > {output}"
