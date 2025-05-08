@@ -57,5 +57,5 @@ rule aggregate_idxstats:
     script:
         "scripts/aggregate_stats.py"
 
-include: "rules/bowtie2-2.smk"
-include: "rules/samtools-2.smk"
+include: "rules/bowtie2.smk"
+include: "rules/samtools.smk"
