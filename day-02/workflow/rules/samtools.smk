@@ -32,7 +32,7 @@ rule stats_bam:
     input: 
         f"{config['output_dir_path']}/bam_sorted/{{sample}}_sorted.bam"
     output: 
-        f"{config['output_dir_path']}/stats/{{sample}}_sorted.txt"
+        f"{config['output_dir_path']}/stats/{{sample}}.stats"
     threads: config["threads"]
     conda:
         "../env/samtools.yaml"

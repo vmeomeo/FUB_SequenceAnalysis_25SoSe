@@ -19,7 +19,7 @@ rule all:
             sample=samples.index
         ),
         expand(
-            f"{config['output_dir_path']}/stats/{{sample}}_sorted.txt",
+            f"{config['output_dir_path']}/stats/{{sample}}.stats",
             sample=samples.index
         ),
         expand(
@@ -49,7 +49,7 @@ rule validate_fastq_paths:
 rule aggregate_idxstats:
     input:
         idxstats = expand(
-            f"{config['output_dir_path']}/stats/{{sample}}_sorted.txt",
+            f"{config['output_dir_path']}/stats/{{sample}}.stats",
             sample=samples.index
         )
     output:
