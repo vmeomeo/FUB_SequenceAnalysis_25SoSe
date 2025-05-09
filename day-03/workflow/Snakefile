@@ -10,52 +10,60 @@ samples = pd.read_csv(config["samples"], index_col = "sample", sep ='\t')
 # #Test
 # print(samples.at["ERR024604_tiny", "fq1"]) 
 
+# rule all:
+#     input:
+#         # All aligned SAM files
+#         expand(
+#             "{output_dir}/sam/{sample}.sam",
+#             output_dir=config["output_dir_path"],
+#             sample=samples.index
+#         ),
+#         expand(
+#             f"{config['output_dir_path']}/stats/{{sample}}.stats",
+#             sample=samples.index
+#         ),
+#         expand(
+#             f"{config['output_dir_path']}/bam_sorted/{{sample}}_sorted.bam.bai", 
+#             sample=samples.index
+#         ),
+#         "logs/validate_fastq.ok",
+#         f"{config['output_dir_path']}/report/aggregated_idxstats.tsv"
 rule all:
     input:
-        # All aligned SAM files
-        expand(
-            "{output_dir}/sam/{sample}.sam",
-            output_dir=config["output_dir_path"],
-            sample=samples.index
-        ),
-        expand(
-            f"{config['output_dir_path']}/stats/{{sample}}.stats",
-            sample=samples.index
-        ),
-        expand(
-            f"{config['output_dir_path']}/bam_sorted/{{sample}}_sorted.bam.bai", 
-            sample=samples.index
-        ),
-        "logs/validate_fastq.ok",
-        f"{config['output_dir_path']}/report/aggregated_idxstats.tsv"
+        expand(config["output_dir_path"]+"/qc/fastqc/{sample}_1_fastqc.html", sample=samples.index),
+        expand(config["output_dir_path"]+"/qc/fastqc/{sample}_2_fastqc.html", sample=samples.index),
+        expand(config["output_dir_path"]+"/qc/fastqc/{sample}_1_fastqc.zip", sample=samples.index),
+        expand(config["output_dir_path"]+"/qc/fastqc/{sample}_2_fastqc.zip", sample=samples.index)
 
-rule validate_fastq_paths:
-    input:
-        fq = list(samples["fq1"]) + list(samples["fq2"])
-    output:
-        temp("logs/validate_fastq.ok")
-    shell:
-        """
-        mkdir -p logs
-        for f in {input}; do
-            if [ ! -f "$f" ]; then
-                echo "Missing: $f" >&2
-                exit 1
-            fi
-        done
-        touch {output}
-        """
 
-rule aggregate_idxstats:
-    input:
-        idxstats = expand(
-            f"{config['output_dir_path']}/stats/{{sample}}.stats",
-            sample=samples.index
-        )
-    output:
-        f"{config['output_dir_path']}/report/aggregated_idxstats.tsv"
-    script:
-        "scripts/aggregate_stats.py"
+# rule validate_fastq_paths:
+#     input:
+#         fq = list(samples["fq1"]) + list(samples["fq2"])
+#     output:
+#         temp("logs/validate_fastq.ok")
+#     shell:
+#         """
+#         mkdir -p logs
+#         for f in {input}; do
+#             if [ ! -f "$f" ]; then
+#                 echo "Missing: $f" >&2
+#                 exit 1
+#             fi
+#         done
+#         touch {output}
+#         """
 
-include: "rules/bowtie2.smk"
-include: "rules/samtools.smk"
+# rule aggregate_idxstats:
+#     input:
+#         idxstats = expand(
+#             f"{config['output_dir_path']}/stats/{{sample}}.stats",
+#             sample=samples.index
+#         )
+#     output:
+#         f"{config['output_dir_path']}/report/aggregated_idxstats.tsv"
+#     script:
+#         "scripts/aggregate_stats.py"
+
+# include: "rules/bowtie2.smk"
+# include: "rules/samtools.smk"
+include: "rules/qc.smk"
