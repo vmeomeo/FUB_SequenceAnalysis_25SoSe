@@ -1,0 +1,61 @@
+import os
+from pathlib import Path
+import pandas as pd
+
+# load samples into table
+
+configfile : "../config/config.yaml"
+samples = pd.read_csv(config["samples"], index_col = "sample", sep ='\t')
+
+# #Test
+# print(samples.at["ERR024604_tiny", "fq1"]) 
+
+rule all:
+    input:
+        # All aligned SAM files
+        expand(
+            "{output_dir}/sam/{sample}.sam",
+            output_dir=config["output_dir_path"],
+            sample=samples.index
+        ),
+        expand(
+            f"{config['output_dir_path']}/stats/{{sample}}.stats",
+            sample=samples.index
+        ),
+        expand(
+            f"{config['output_dir_path']}/bam_sorted/{{sample}}_sorted.bam.bai", 
+            sample=samples.index
+        ),
+        "logs/validate_fastq.ok",
+        f"{config['output_dir_path']}/report/aggregated_idxstats.tsv"
+
+rule validate_fastq_paths:
+    input:
+        fq = list(samples["fq1"]) + list(samples["fq2"])
+    output:
+        temp("logs/validate_fastq.ok")
+    shell:
+        """
+        mkdir -p logs
+        for f in {input}; do
+            if [ ! -f "$f" ]; then
+                echo "Missing: $f" >&2
+                exit 1
+            fi
+        done
+        touch {output}
+        """
+
+rule aggregate_idxstats:
+    input:
+        idxstats = expand(
+            f"{config['output_dir_path']}/stats/{{sample}}.stats",
+            sample=samples.index
+        )
+    output:
+        f"{config['output_dir_path']}/report/aggregated_idxstats.tsv"
+    script:
+        "scripts/aggregate_stats.py"
+
+include: "rules/bowtie2.smk"
+include: "rules/samtools.smk"
