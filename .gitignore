@@ -1,7 +1,8 @@
 ### Data
 data/
 ### Test file
-*/*.ipynb
+day-01/*.ipynb
+day-02/*.ipynb
 
 ### Day 01
 
