@@ -1,5 +1,7 @@
 ### Data
 data/
+### Test file
+*.ipynb
 
 ### Day 01
 
