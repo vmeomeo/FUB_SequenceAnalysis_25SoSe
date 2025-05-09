@@ -17,3 +17,4 @@ N_penalty: 1
 ref_gap_penalty: '5,3' # Don't write as '5, 3' (notice the space)
 
 ##### Trimmomatic Params #####
+
