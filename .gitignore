@@ -2,7 +2,7 @@
 data/
 ### Test file
 *.ipynb
-
+.snakemake/
 ### Day 01
 
 # Snakemake cache and logs
