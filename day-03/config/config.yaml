@@ -2,14 +2,11 @@ project_name : day-03-SeqAn
 author: "Hang Mai Anh Vo, Baptiste Roizard"
 date: 2025.05.09
 
-ref: "../data/ref/GCF_000240185.1_ASM24018v2_genomic.fna"
-input_dir: "../data/fastq/small/subsampled_0.1"
+ref: "../data/reference.fa"
 output_dir_path: "../results"
 create_input_tsv: false
 
 samples: "../config/samples.tsv"
-
-threads: 4
 
 ##### Bowtie2 Params #####
 bowtie_threads: 4
@@ -17,3 +14,13 @@ N_penalty: 1
 ref_gap_penalty: '5,3' # Don't write as '5, 3' (notice the space)
 
 ##### Trimmomatic Params #####
+adapter_file: "../resources/TruSeq2-PE.fa"
+trimmo_threads: 4
+seed_mismatches: 2
+palindromeClipThreshold: 30
+simpleClipThreshold: 10
+leading: 3
+trailing: 3
+sliding_window_lb: 4
+sliding_window_ub: 15
+minlen: 36

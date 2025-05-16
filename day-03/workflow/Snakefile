@@ -10,31 +10,29 @@ samples = pd.read_csv(config["samples"], index_col = "sample", sep ='\t')
 # #Test
 # print(samples.at["ERR024604_tiny", "fq1"]) 
 
-# rule all:
-#     input:
-#         # All aligned SAM files
-#         expand(
-#             "{output_dir}/sam/{sample}.sam",
-#             output_dir=config["output_dir_path"],
-#             sample=samples.index
-#         ),
-#         expand(
-#             f"{config['output_dir_path']}/stats/{{sample}}.stats",
-#             sample=samples.index
-#         ),
-#         expand(
-#             f"{config['output_dir_path']}/bam_sorted/{{sample}}_sorted.bam.bai", 
-#             sample=samples.index
-#         ),
-#         "logs/validate_fastq.ok",
-#         f"{config['output_dir_path']}/report/aggregated_idxstats.tsv"
 rule all:
     input:
-        expand(config["output_dir_path"]+"/qc/fastqc/{sample}_1_fastqc.html", sample=samples.index),
-        expand(config["output_dir_path"]+"/qc/fastqc/{sample}_2_fastqc.html", sample=samples.index),
-        expand(config["output_dir_path"]+"/qc/fastqc/{sample}_1_fastqc.zip", sample=samples.index),
-        expand(config["output_dir_path"]+"/qc/fastqc/{sample}_2_fastqc.zip", sample=samples.index)
-
+        # # All aligned SAM files
+        # expand(
+        #     "{output_dir}/sam/{sample}.sam",
+        #     output_dir=config["output_dir_path"],
+        #     sample=samples.index
+        # ),
+        expand(
+            f"{config['output_dir_path']}/stats/{{sample}}.stats",
+            sample=samples.index
+        ),
+        # expand(
+        #     f"{config['output_dir_path']}/bam_sorted/{{sample}}_sorted.bam.bai", 
+        #     sample=samples.index
+        # ),
+        "logs/validate_fastq.ok",
+        f"{config['output_dir_path']}/report/aggregated_idxstats.tsv",
+        expand("../results/qc/qualimap/{sample}_qualimap_report", sample=samples.index),
+        "../results/qc/multiqc_report.html"
+# rule all:
+#     input:
+#         expand("../results/qc/qualimap/{sample}_qualimap_report", sample=samples.index)
 
 # rule validate_fastq_paths:
 #     input:
@@ -53,17 +51,19 @@ rule all:
 #         touch {output}
 #         """
 
-# rule aggregate_idxstats:
-#     input:
-#         idxstats = expand(
-#             f"{config['output_dir_path']}/stats/{{sample}}.stats",
-#             sample=samples.index
-#         )
-#     output:
-#         f"{config['output_dir_path']}/report/aggregated_idxstats.tsv"
-#     script:
-#         "scripts/aggregate_stats.py"
+rule aggregate_idxstats:
+    input:
+        idxstats = expand(
+            f"{config['output_dir_path']}/stats/{{sample}}.stats",
+            sample=samples.index
+        )
+    output:
+        f"{config['output_dir_path']}/report/aggregated_idxstats.tsv"
+    script:
+        "scripts/aggregate_stats.py"
 
-# include: "rules/bowtie2.smk"
-# include: "rules/samtools.smk"
+include: "rules/bowtie2.smk"
+include: "rules/samtools.smk"
 include: "rules/qc.smk"
+include: "rules/qualimap2.smk"
+include: "rules/multiqc.smk"
