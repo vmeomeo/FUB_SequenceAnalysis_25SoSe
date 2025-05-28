@@ -1,0 +1,18 @@
+import os
+from pathlib import Path
+import pandas as pd
+
+# load samples into table
+
+configfile : "./config/config.yaml"
+samples = pd.read_csv(config["samples"], index_col = "sample", sep ='\t')
+
+rule all:
+    input:
+        expand(
+            f"{config['output_dir_path']}/assembly/{{sample}}_{{read_number}}",
+            sample=samples.index,
+            read_number=["1", "2"]
+            )
+include: "rules/fastp.smk"
+include: "rules/spades.smk"
