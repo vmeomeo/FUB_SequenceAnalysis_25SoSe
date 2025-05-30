@@ -1,0 +1,9 @@
+project_name : day-04-SeqAn
+author: "Hang Mai Anh Vo, Baptiste Roizard"
+date: 2025.05.09
+
+ref: "data/reference.fa"
+output_dir_path: "results"
+create_input_tsv: false
+
+samples: "config/samples.tsv"

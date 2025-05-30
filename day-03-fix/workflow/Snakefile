@@ -1,0 +1,36 @@
+import os
+from pathlib import Path
+import pandas as pd
+
+# load samples into table
+
+configfile : "./config/config.yaml"
+samples = pd.read_csv(config["samples"], index_col = "sample", sep ='\t')
+
+
+rule all:
+    input:
+        expand(
+            f"{config['output_dir_path']}/stats/{{sample}}.stats",
+            sample=samples.index
+        ),
+        f"{config['output_dir_path']}/report/aggregated_idxstats.tsv",
+        expand(f"{config['output_dir_path']}/qc/qualimap/{{sample}}_qualimap_report", sample=samples.index),
+        f"{config['output_dir_path']}/qc/multiqc_report.html"
+
+rule aggregate_idxstats:
+    input:
+        idxstats = expand(
+            f"{config['output_dir_path']}/stats/{{sample}}.stats",
+            sample=samples.index
+        )
+    output:
+        f"{config['output_dir_path']}/report/aggregated_idxstats.tsv"
+    script:
+        "scripts/aggregate_stats.py"
+
+include: "rules/bowtie2.smk"
+include: "rules/samtools.smk"
+include: "rules/qc.smk"
+include: "rules/qualimap2.smk"
+include: "rules/multiqc.smk"
