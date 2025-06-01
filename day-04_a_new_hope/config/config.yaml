@@ -6,3 +6,4 @@ output_dir_path: "results"
 create_input_tsv: false
 window_size: 100
 samples: "config/samples.tsv"
+reference_genome: "resources/sequence.fasta"

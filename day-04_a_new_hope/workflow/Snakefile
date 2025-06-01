@@ -1,0 +1,62 @@
+import os
+from pathlib import Path
+import pandas as pd
+
+# load samples into table
+
+configfile : "./config/config.yaml"
+samples = pd.read_csv(config["samples"], index_col = "sample", sep ='\t')
+
+rule all:
+    input:
+        # #spades
+        # expand(
+        #     f"{config['output_dir_path']}/assembly/{{sample}}_{{read_number}}",
+        #     sample=samples.index,
+        #     read_number=["1", "2"]
+        # ),
+        # #for quast
+        # expand(
+        #     f"{config['output_dir_path']}/assembly_qc/{{sample}}_{{read_number}}",
+        #     sample=samples.index,
+        #     read_number=["1", "2"]
+        # ),
+        #for ragtag
+        expand(
+            f"{config['output_dir_path']}/scaffolded/{{sample}}_{{read_number}}.scaffolded.fasta",
+            sample=samples.index,
+            read_number=["1","2"]
+        ),
+        # #for mafft
+        # expand(
+        #     f"{config['output_dir_path']}/alignment/{{sample}}_{{read_number}}_aligned.fasta",
+        #     sample=samples.index,
+        #     read_number=["1", "2"]
+        # ),
+        # #for iqtree
+        # expand(
+        #     f"{config['output_dir_path']}/phylogeny/{{sample}}_{{read_number}}/tree.treefile",
+        #     sample=samples.index,
+        #     read_number=["1", "2"]
+        # ),
+        # #for ete3 vis
+        # expand(
+        #     f"{config['output_dir_path']}/phylogeny/{{sample}}_{{read_number}}/tree.png",
+        #     sample=samples.index,
+        #     read_number=["1", "2"]
+        # ),
+        # #for var
+        # expand([
+        #     f"{config['output_dir_path']}/variability/{{sample}}_{{read_number}}_windows_var.txt",
+        #     f"{config['output_dir_path']}/variability/{{sample}}_{{read_number}}_var_plot.png"
+        # ], sample=samples.index, read_number=["1", "2"])
+
+include: "rules/fastp.smk"
+include: "rules/spades.smk"
+include: "rules/quast.smk"
+include: "rules/ragtag.smk"
+include: "rules/concat.smk"
+include: "rules/mafft.smk"
+include: "rules/iqtree.smk"
+include: "rules/vis.smk"
+include: "rules/var.smk"

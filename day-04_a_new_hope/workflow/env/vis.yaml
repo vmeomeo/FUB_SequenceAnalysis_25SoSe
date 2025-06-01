@@ -1,0 +1,10 @@
+name: vis
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.9
+  - ete3
+  - pycairo
+  - pillow
+  - fontconfig 

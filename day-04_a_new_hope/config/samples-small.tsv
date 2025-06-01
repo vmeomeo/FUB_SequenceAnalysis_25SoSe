@@ -1,0 +1,3 @@
+sample	fq1	fq2
+sample_22	data/sample_22_1.fastq.gz	data/sample_22_2.fastq.gz
+sample_24	data/sample_24_1.fastq.gz	data/sample_24_2.fastq.gz

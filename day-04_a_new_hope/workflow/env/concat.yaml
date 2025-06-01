@@ -1,0 +1,6 @@
+name: concat
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - biopython

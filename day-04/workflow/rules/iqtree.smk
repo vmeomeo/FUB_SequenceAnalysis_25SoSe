@@ -11,9 +11,10 @@ rule iqtree:
         "../env/iqtree.yaml"
     params:
         # prefix = lambda wc : f"{config['output_dir_path']}/phylogeny/{wc.sample}_{wc.read_number}/tree"
-        prefix = f"{config['output_dir_path']}/phylogeny/{{sample}}_{{read_number}}/tree"
+        prefix = f"{config['output_dir_path']}/phylogeny/{{sample}}_{{read_number}}/tree",
+        threads_max = 32
     shell:
         """
         mkdir -p $(dirname {log})
-        iqtree -s {input.alignment} -nt {threads} -pre {params.prefix} > {log} 2>&1
+        iqtree -s {input.alignment} -nt {threads} -ntmax {params.threads_max} -fast -pre {params.prefix} > {log} 2>&1
         """
