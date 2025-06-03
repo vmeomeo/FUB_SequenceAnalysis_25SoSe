@@ -56,7 +56,8 @@ rule all:
         #for iqtree
         #f"{config['output_dir_path']}/phylogeny/all_samples.treefile"
         #for vis
-        # f"{config['output_dir_path']}/phylogeny/all_samples.tree.png"
+        f"{config['output_dir_path']}/phylogeny/all_samples.tree.png",
+        #for var
         f"{config['output_dir_path']}/variability/all_samples_var_plot.png",
         f"{config['output_dir_path']}/variability/all_samples_windows_var.txt"
 
