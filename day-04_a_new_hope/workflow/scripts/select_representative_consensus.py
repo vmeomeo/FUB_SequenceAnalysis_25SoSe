@@ -2,29 +2,33 @@
 import os
 import sys
 from Bio import SeqIO
-from collections import defaultdict
 
-scaffold_files = sys.argv[1:-1]
+input_files = sys.argv[1:-1]
 output_file = sys.argv[-1]
 
 os.makedirs(os.path.dirname(output_file), exist_ok=True)
+
 representative_seqs = {}
 
-for filepath in scaffold_files:
+for filepath in input_files:
     filename = os.path.basename(filepath)
-    parts = filename.split("_")
-    sample = "_".join(parts[:-2])
-    read_number = parts[-2]
+    # Remove the suffix to isolate sample and read number
+    basename = filename.replace(".consensus.fasta", "")  # e.g. sample_22_1
+    parts = basename.split("_")
+    sample = "_".join(parts[:-1])   # e.g. "sample_22"
+    read_number = parts[-1]         # e.g. "1"
     full_sample_id = f"{sample}_{read_number}"
 
     records = list(SeqIO.parse(filepath, "fasta"))
     if not records:
         continue
 
+    # Select longest sequence from the fasta file
     longest = max(records, key=lambda r: len(r.seq))
     longest.id = full_sample_id
     longest.description = ""
 
+    # Keep only the longest representative sequence per sample
     if sample not in representative_seqs or len(longest.seq) > len(representative_seqs[sample].seq):
         representative_seqs[sample] = longest
 

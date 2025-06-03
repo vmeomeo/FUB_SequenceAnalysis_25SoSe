@@ -2,7 +2,8 @@ rule spades:
     input:
         cleaned = f"{config['output_dir_path']}/cleaned/{{sample}}_{{read_number}}.fastq"
     output:
-        assembly_dir = directory(f"{config['output_dir_path']}/assembly/{{sample}}_{{read_number}}")
+        assembly_dir = directory(f"{config['output_dir_path']}/assembly/{{sample}}_{{read_number}}"),
+        assembly = f"{config['output_dir_path']}/assembly/{{sample}}_{{read_number}}/contigs.fasta"
     conda:
         "../env/spades.yaml"
     threads: workflow.cores

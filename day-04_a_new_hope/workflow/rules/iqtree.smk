@@ -14,5 +14,5 @@ rule iqtree:
     shell:
         """
         mkdir -p $(dirname {log})
-        iqtree -s {input.alignment} -nt {threads} -ntmax {params.threads_max} -fast -pre {params.prefix} > {log} 2>&1
+        iqtree -s {input.alignment} -nt {threads} -ntmax {params.threads_max} -pre {params.prefix} > {log} 2>&1
         """

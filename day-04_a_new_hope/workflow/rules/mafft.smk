@@ -10,6 +10,6 @@ rule mafft:
         f"{config['output_dir_path']}/alignment/logs/mafft_all_samples.log"
     shell:
         """
-        mkdir -p $(dirname {log})
+        mkdir -p {config[output_dir_path]}/alignment/logs
         mafft --auto --thread {threads} {input.fasta} > {output.alignment} 2> {log}
         """
