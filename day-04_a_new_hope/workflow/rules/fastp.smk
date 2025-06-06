@@ -15,5 +15,3 @@ rule fastp:
         """
         fastp --trim_front1 16 --cut_front --cut_front_window_size 4 --cut_front_mean_quality 20 -i {input.fq} -o {output.files} -j {output.json} -h {output.html} > {log} 2>&1
         """
-        # Old: #  fastp -i {input.fq} -o {output.files} -j {output.json} -h {output.html} > {log} 2>&1
-        # Anh: I add trimming options

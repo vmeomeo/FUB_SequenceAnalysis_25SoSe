@@ -24,13 +24,3 @@ for leaf in t.iter_leaves():
 t.render('{output.image}', w=800, units='px')
 " > {log} 2>&1
         """
-        # "../scripts/vis.py"
-#         """
-#         mkdir -p $(dirname {output.image})
-#         xvfb-run -a python -c "
-# import sys
-# from ete3 import Tree
-# t = Tree('{input.treefile}', format=0)
-# t.render('{output.image}', w=800, units='px')
-# " > {log} 2>&1
-#         """

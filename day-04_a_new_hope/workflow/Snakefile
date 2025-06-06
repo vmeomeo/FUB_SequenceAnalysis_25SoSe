@@ -9,67 +9,21 @@ samples = pd.read_csv(config["samples"], index_col = "sample", sep ='\t')
 
 rule all:
     input:
-        #fastp --> only for testing
-        # expand(
-        #     f"{config['output_dir_path']}/cleaned/{{sample}}_{{read_number}}.fastq",
-        #     sample=samples.index,
-        #     read_number=["1", "2"]
-        # ),
-        #spades
-        # expand(
-        #     f"{config['output_dir_path']}/assembly/{{sample}}_{{read_number}}",
-        #     sample=samples.index,
-        #     read_number=["1", "2"]
-        # ),
-        #megahit
-        # expand(
-        #     f"{config['output_dir_path']}/assembly/{{sample}}",
-        #     sample=samples.index
-        # )
-        #for quast
-        # expand(
-        #     f"{config['output_dir_path']}/assembly_qc/{{sample}}_{{read_number}}",
-        #     sample=samples.index,
-        #     read_number=["1", "2"]
-        # )
-        #for align_assembly
-        # expand(
-        #     # [f"{config['output_dir_path']}/alignment/{{sample}}_{{read_number}}.sorted.bam",
-        #     [f"{config['output_dir_path']}/bam_sorted/{{sample}}_{{read_number}}_sorted.bam",
-        #     # f"{config['output_dir_path']}/alignment/{{sample}}_{{read_number}}.sorted.bam.bai"],
-        #     f"{config['output_dir_path']}/bam_sorted/{{sample}}_{{read_number}}_sorted.bam.bai"],
-        #     sample=samples.index,
-        #     read_number=["1", "2"]
-        # ),
-        #for call_consensus
-        # expand(
-        #     [f"{config['output_dir_path']}/consensus/{{sample}}_{{read_number}}.vcf.gz",
-        #     f"{config['output_dir_path']}/consensus/{{sample}}_{{read_number}}.vcf.gz.tbi",
-        #     f"{config['output_dir_path']}/consensus/{{sample}}_{{read_number}}.consensus.fasta"],
-        #     sample=samples.index,
-        #     read_number=["1", "2"]
-        # ),
-        #for concat_consensus
-        #f"{config['output_dir_path']}/all_samples/all_samples.fasta"
-        #for mafft
-        # f"{config['output_dir_path']}/alignment/all_samples_aligned.fasta"
-        #for iqtree
-        #f"{config['output_dir_path']}/phylogeny/all_samples.treefile"
-        #for vis
+        expand(
+            f"{config['output_dir_path']}/assembly_qc/{{sample}}_{{read_number}}",
+            sample=samples.index,
+            read_number=["1", "2"]
+        ),
         f"{config['output_dir_path']}/phylogeny/all_samples.tree.png",
-        #for var
         f"{config['output_dir_path']}/variability/all_samples_var_plot.png",
         f"{config['output_dir_path']}/variability/all_samples_windows_var.txt"
 
 include: "rules/fastp.smk"
 include: "rules/spades.smk"
-# include: "rules/megahit.smk"
 include: "rules/quast.smk"
 include: "rules/align_assembly.smk"
 include: "rules/call_consensus.smk"
 include: "rules/concat_consensus.smk"
-# include: "rules/ragtag.smk"
-# include: "rules/concat.smk"
 include: "rules/mafft.smk"
 include: "rules/iqtree.smk"
 include: "rules/vis.smk"

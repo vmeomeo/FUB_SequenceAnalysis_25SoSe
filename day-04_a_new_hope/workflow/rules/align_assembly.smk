@@ -1,32 +1,3 @@
-# rule align_assembly:
-#     input:
-#         assembly = f"{config['output_dir_path']}/assembly/{{sample}}_{{read_number}}/contigs.fasta",
-#         reference = "resources/sequence.fasta"
-#     output:
-#         bam = f"{config['output_dir_path']}/alignment/{{sample}}_{{read_number}}.sorted.bam",
-#         bai = f"{config['output_dir_path']}/alignment/{{sample}}_{{read_number}}.sorted.bam.bai"
-#     conda:
-#         "../env/align_assembly.yaml"
-#     threads: workflow.cores
-#     log:
-#         f"{config['output_dir_path']}/alignment/logs/align_{{sample}}_{{read_number}}.log"
-#     shell:
-#         """
-#         set -euo pipefail
-#         mkdir -p {config[output_dir_path]}/alignment/logs
-
-#         minimap2 -t {threads} -ax asm5 {input.reference} {input.assembly} > temp_{wildcards.sample}_{wildcards.read_number}.sam
-
-#         samtools view -@ {threads} -bS temp_{wildcards.sample}_{wildcards.read_number}.sam > temp_{wildcards.sample}_{wildcards.read_number}.bam
-
-#         samtools sort -@ {threads} -o {output.bam} temp_{wildcards.sample}_{wildcards.read_number}.bam
-
-#         samtools index {output.bam}
-
-#         rm temp_{wildcards.sample}_{wildcards.read_number}.sam temp_{wildcards.sample}_{wildcards.read_number}.bam
-
-#         echo "Alignment completed for {wildcards.sample}_{wildcards.read_number}" > {log}
-#         """
 rule align_with_minimap2:
     input:
         assembly = f"{config['output_dir_path']}/assembly/{{sample}}_{{read_number}}/contigs.fasta",
