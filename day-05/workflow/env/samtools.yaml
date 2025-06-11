@@ -1,0 +1,13 @@
+name: samtools_env
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - samtools=1.18
+  - htslib=1.18
+  - libdeflate=1.18
+  - zlib=1.2.13
+  - bzip2=1.0.8
+  - xz=5.4.5
+  - python=3.11  # if you want Python available, useful for scripting

@@ -1,0 +1,20 @@
+project_name : day-05-SeqAn
+author: "Hang Mai Anh Vo, Baptiste Roizard"
+date: 2025.06.06
+
+output_dir_path: "results"
+create_input_tsv: false
+fastp_flags: "--cut_front --cut_front_window_size 4 --cut_front_mean_quality 20"
+# or if you want to keep trim_front1 configurable too, add it here:
+# fastp_flags: "--trim_front1 16 --cut_front --cut_front_window_size 4 --cut_front_mean_quality 20"
+
+window_size: 100
+step_size: 10
+
+samples: "config/samples.tsv"
+reference_genome: "resources/sequence.fasta"
+kraken_db: "data/kraken2_db"
+
+samtools_mpileup_flags: "-aa -A -d 1000000 -u"
+samtools_consensus_flags: "-d 5"  # Minimum depth for consensus; can also add -N to force Ns instead of ref bases
+
