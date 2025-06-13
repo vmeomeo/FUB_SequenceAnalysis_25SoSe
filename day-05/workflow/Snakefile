@@ -9,12 +9,34 @@ samples = pd.read_csv(config["samples"], index_col = "sample", sep ='\t')
 
 rule all:
     input:
+        # expand(
+        #     f"{config['output_dir_path']}/cleaned/{{sample}}_{{read_number}}.fastq",
+        #     sample=samples.index,
+        #     read_number=["1", "2"]
+        # ),
+        #spades
         expand(
-            f"{config['output_dir_path']}/assembly_qc/{{sample}}_{{read_number}}",
-            sample=samples.index,
-            read_number=["1", "2"]
+            f"{config['output_dir_path']}/assembly/{{sample}}/contigs.fasta",
+            sample=samples.index
         ),
+        #quast
+        expand(f"{config['output_dir_path']}/assembly_qc/{{sample}}/report.html",
+                           sample=samples.index),
+        #align_assembly
+        expand(
+            f"{config['output_dir_path']}/bam_sorted/{{sample}}_sorted.bam.bai",
+            sample=samples.index
+        ),
+        # #call_concat_consensus
+
+        expand(f"{config['output_dir_path']}/consensus/{{sample}}.consensus.fasta",
+                              sample=samples.index),
+        f"{config['output_dir_path']}/all_samples/all_samples.fasta",
+        f"{config['output_dir_path']}/alignment/all_samples_aligned.fasta",
+        f"{config['output_dir_path']}/phylogeny/all_samples.treefile",
         f"{config['output_dir_path']}/phylogeny/all_samples.tree.png",
+        f"{config['output_dir_path']}/qc/multiqc_report.html",
+        # f"{config['output_dir_path']}/phylogeny/all_samples.tree.png",
         f"{config['output_dir_path']}/variability/all_samples_var_plot.png",
         f"{config['output_dir_path']}/variability/all_samples_windows_var.txt"
 
@@ -22,9 +44,8 @@ include: "rules/fastp.smk"
 include: "rules/spades.smk"
 include: "rules/quast.smk"
 include: "rules/align_assembly.smk"
-include: "rules/call_consensus.smk"
-include: "rules/concat_consensus.smk"
+include: "rules/call_concat_consensus.smk"
 include: "rules/mafft.smk"
-include: "rules/iqtree.smk"
-include: "rules/vis.smk"
+include: "rules/iqtree_vis.smk"
 include: "rules/var.smk"
+include: "rules/multiqc.smk"

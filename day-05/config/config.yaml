@@ -15,6 +15,3 @@ samples: "config/samples.tsv"
 reference_genome: "resources/sequence.fasta"
 kraken_db: "data/kraken2_db"
 
-samtools_mpileup_flags: "-aa -A -d 1000000 -u"
-samtools_consensus_flags: "-d 5"  # Minimum depth for consensus; can also add -N to force Ns instead of ref bases
-

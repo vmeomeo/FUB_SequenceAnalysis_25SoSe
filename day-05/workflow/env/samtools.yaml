@@ -1,13 +1,12 @@
 name: samtools_env
 channels:
-  - bioconda
   - conda-forge
+  - bioconda
   - defaults
 dependencies:
-  - samtools=1.18
-  - htslib=1.18
-  - libdeflate=1.18
-  - zlib=1.2.13
-  - bzip2=1.0.8
-  - xz=5.4.5
-  - python=3.11  # if you want Python available, useful for scripting
+  - samtools=1.22
+  # - htslib=1.22
+  # - libdeflate>=1.22,<1.25
+  # - zlib=1.2.13
+  # - bzip2=1.0.8
+  # - xz>=5.4.5,<6

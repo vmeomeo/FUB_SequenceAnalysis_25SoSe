@@ -7,7 +7,7 @@ rule fastp:
         json = f"{config['output_dir_path']}/qc/{{sample}}_{{read_number}}_fastp.json"
     params:
         config_dir = config['output_dir_path'],
-        fastp_flags = config.get('fastp_flags', '')
+        fastp_flags = config['fastp_flags']
     conda:
         "../env/fastp.yaml"
     log:
