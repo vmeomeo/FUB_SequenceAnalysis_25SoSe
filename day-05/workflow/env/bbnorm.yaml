@@ -1,0 +1,7 @@
+name: bbnorm_env
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - bbmap=39.01  # version that includes bbnorm.sh
