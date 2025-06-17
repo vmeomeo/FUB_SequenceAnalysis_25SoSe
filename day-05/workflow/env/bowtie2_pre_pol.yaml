@@ -1,0 +1,5 @@
+name: bowtie2_pre_pol
+channels:
+  - bioconda
+dependencies:
+  - bowtie2=2.5.1

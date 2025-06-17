@@ -7,6 +7,21 @@ import pandas as pd
 configfile : "./config/config.yaml"
 samples = pd.read_csv(config["samples"], index_col = "sample", sep ='\t')
 
+# ask for the polish step files or not
+if config.get("enable_polishing", False):
+    polishing_outputs = expand(
+        f"{config['output_dir_path']}/polishing/{{sample}}_polished.fasta",
+        sample=samples.index
+    )
+else:
+    polishing_outputs = expand(
+        f"{config['output_dir_path']}/assembly/{{sample}}/contigs.fasta",
+        sample=samples.index
+    )
+
+
+
+
 rule all:
     input:
         expand(
@@ -57,7 +72,88 @@ rule all:
             f"{config['output_dir_path']}/normalized/{{sample}}_{{read_number}}.fastq",
             sample=samples.index,
             read_number=["1", "2"]
-        )
+        ),
+        polishing_outputs
+
+# optional polishing rule
+if config.get("enable_polishing", False):
+
+    rule bowtie2_align:
+        input:
+            r1 = f"{config['output_dir_path']}/normalized/{{sample}}_1.fastq",
+            r2 = f"{config['output_dir_path']}/normalized/{{sample}}_2.fastq",
+            contigs = f"{config['output_dir_path']}/assembly/{{sample}}/contigs.fasta"
+        output:
+            sam = temp(f"{config['output_dir_path']}/polishing/tmp/{{sample}}.sam")
+        conda:
+            "env/bowtie2_pre_pol.yaml"
+        threads: workflow.cores
+        log:
+            f"{config['output_dir_path']}/polishing/logs/bowtie2_{{sample}}.log"
+        shell:
+            """
+            bowtie2-build {input.contigs} polishing_contigs_index
+            bowtie2 -x polishing_contigs_index \
+                    -1 {input.r1} \
+                    -2 {input.r2} \
+                    -p {threads} \
+                    -S {output.sam} 2>> {log}
+            """
+    rule samtools_process:
+        input:
+            sam = f"{config['output_dir_path']}/polishing/tmp/{{sample}}.sam"
+        output:
+            bam = f"{config['output_dir_path']}/polishing/{{sample}}.bam",
+            bai = f"{config['output_dir_path']}/polishing/{{sample}}.bam.bai"
+        conda:
+            "env/samtools.yaml"
+        threads: workflow.cores
+        log:
+            f"{config['output_dir_path']}/polishing/logs/samtools_{{sample}}.log"
+        shell:
+            """
+            samtools view -@ {threads} -Sb {input.sam} | \
+            samtools sort -@ {threads} -o {output.bam} - 2>> {log}
+            samtools index {output.bam}
+            """
+    
+    
+    # rule index_bam_pre_polish:
+    #     input: 
+    #         f"{config['output_dir_path']}/polishing/{{sample}}.bam"
+    #     output: 
+    #         f"{config['output_dir_path']}/polishing/{{sample}}.bam.bai"
+    #     threads: workflow.cores
+    #     conda:
+    #         "env/samtools.yaml"
+    #     log:
+    #         f"{config['output_dir_path']}/polishing/logs/index_bam_pre_polish_{{sample}}.log"
+    #     shell: 
+    #         """
+    #         samtools index {input} {output}
+    #         echo "Indexing done for {wildcards.sample}" > {log}
+    #         """
+
+    rule polish_with_pilon:
+        input:
+            bam = f"{config['output_dir_path']}/polishing/{{sample}}.bam",
+            bam_index = f"{config['output_dir_path']}/polishing/{{sample}}.bam.bai",
+            unpolished = f"{config['output_dir_path']}/assembly/{{sample}}/contigs.fasta"
+        output:
+            polished = f"{config['output_dir_path']}/polishing/{{sample}}_polished.fasta"
+        conda:
+            "env/pilon.yaml"
+        threads: workflow.cores
+        log:
+            f"{config['output_dir_path']}/polishing/logs/pilon_{{sample}}.log"
+        params:
+            outdir = config['output_dir_path']
+        shell:
+            """
+            pilon --genome {input.unpolished} --frags {input.bam} --output {wildcards.sample}_pilon \
+                  --outdir {params.outdir}/polishing --threads {threads} > {log} 2>&1
+            mv {params.outdir}/polishing/{wildcards.sample}_pilon.fasta {output.polished}
+            """
 
 
 

@@ -5,8 +5,3 @@ channels:
   - defaults
 dependencies:
   - samtools=1.22
-  # - htslib=1.22
-  # - libdeflate>=1.22,<1.25
-  # - zlib=1.2.13
-  # - bzip2=1.0.8
-  # - xz>=5.4.5,<6

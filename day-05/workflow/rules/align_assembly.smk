@@ -1,7 +1,10 @@
 rule align_with_minimap2:
     input:
-        assembly = f"{config['output_dir_path']}/assembly/{{sample}}/contigs.fasta",
-        reference = "resources/sequence.fasta"
+        assembly = lambda wc: 
+            f"{config['output_dir_path']}/polishing/{wc.sample}_polished.fasta"
+            if config.get("enable_polishing", False) 
+            else f"{config['output_dir_path']}/assembly/{wc.sample}/contigs.fasta",
+        reference = config["reference_genome"]
     output:
         f"{config['output_dir_path']}/sam/{{sample}}.sam"
     threads: workflow.cores
