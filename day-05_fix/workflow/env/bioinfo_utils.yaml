@@ -1,0 +1,11 @@
+# env/bioinfo_utils.yaml
+
+name: bioinfo_utils
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - blast=2.14.1
+  - ragtag=2.1.0
+  - python=3.10

@@ -1,0 +1,7 @@
+name: align_assembly
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - minimap2=2.24

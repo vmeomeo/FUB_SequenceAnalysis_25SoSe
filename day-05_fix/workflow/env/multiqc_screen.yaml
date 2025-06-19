@@ -1,0 +1,10 @@
+name: multiqc_screen
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.8.*
+  - multiqc=1.16  # Matches your working version
+  - rich=10.*
+  - pandas

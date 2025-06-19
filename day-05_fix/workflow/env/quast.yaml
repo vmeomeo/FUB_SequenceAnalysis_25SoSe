@@ -1,0 +1,9 @@
+name: quast
+channels:
+  - conda-forge      # Important: conda-forge first
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.9
+  - quast=5.2.0
+  - circos

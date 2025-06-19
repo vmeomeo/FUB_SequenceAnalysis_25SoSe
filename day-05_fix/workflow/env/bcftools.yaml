@@ -1,0 +1,6 @@
+name: bcftools_env
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - bcftools=1.18
