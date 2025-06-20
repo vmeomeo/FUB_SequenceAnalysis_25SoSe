@@ -4,7 +4,7 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - python=3.8.*  # Must be ≥3.7 (3.8 or 3.9 recommended)
-  - multiqc=1.16  # Stable version
-  - rich=10.*     # Required by MultiQC (avoid conflicts)
-  - pandas        # Often needed for plugins
+  - python=3.8.* 
+  - multiqc=1.16 
+  - rich=10.*    
+  - pandas      

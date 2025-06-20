@@ -1,0 +1,8 @@
+name: ragtag_env
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - ragtag=2.0.0
+  - samtools

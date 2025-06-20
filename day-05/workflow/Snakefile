@@ -117,23 +117,6 @@ if config.get("enable_polishing", False):
             samtools index {output.bam}
             """
     
-    
-    # rule index_bam_pre_polish:
-    #     input: 
-    #         f"{config['output_dir_path']}/polishing/{{sample}}.bam"
-    #     output: 
-    #         f"{config['output_dir_path']}/polishing/{{sample}}.bam.bai"
-    #     threads: workflow.cores
-    #     conda:
-    #         "env/samtools.yaml"
-    #     log:
-    #         f"{config['output_dir_path']}/polishing/logs/index_bam_pre_polish_{{sample}}.log"
-    #     shell: 
-    #         """
-    #         samtools index {input} {output}
-    #         echo "Indexing done for {wildcards.sample}" > {log}
-    #         """
-
     rule polish_with_pilon:
         input:
             bam = f"{config['output_dir_path']}/polishing/{{sample}}.bam",

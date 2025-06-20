@@ -10,13 +10,18 @@ samples = pd.read_csv(config["samples"], index_col = "sample", sep ='\t')
 rule all:
     input:
         expand(
-            f"{config['output_dir_path']}/assembly_qc/{{sample}}_{{read_number}}",
+            f"{config['output_dir_path']}/cleaned/{{sample}}_{{read_number}}.fastq",
             sample=samples.index,
             read_number=["1", "2"]
-        ),
-        f"{config['output_dir_path']}/phylogeny/all_samples.tree.png",
-        f"{config['output_dir_path']}/variability/all_samples_var_plot.png",
-        f"{config['output_dir_path']}/variability/all_samples_windows_var.txt"
+        )
+        # expand(
+        #     f"{config['output_dir_path']}/assembly_qc/{{sample}}_{{read_number}}",
+        #     sample=samples.index,
+        #     read_number=["1", "2"]
+        # ),
+        # f"{config['output_dir_path']}/phylogeny/all_samples.tree.png",
+        # f"{config['output_dir_path']}/variability/all_samples_var_plot.png",
+        # f"{config['output_dir_path']}/variability/all_samples_windows_var.txt"
 
 include: "rules/fastp.smk"
 include: "rules/spades.smk"

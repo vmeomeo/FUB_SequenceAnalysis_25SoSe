@@ -5,6 +5,6 @@ channels:
   - defaults
 dependencies:
   - python=3.8.*
-  - multiqc=1.16  # Matches your working version
+  - multiqc=1.16 
   - rich=10.*
   - pandas

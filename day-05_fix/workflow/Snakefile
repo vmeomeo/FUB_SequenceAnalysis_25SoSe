@@ -1,19 +1,11 @@
-# =======================
-# Snakemake Workflow Final Snakefile
-# Cleaned per Feedback Assignment 5A
-# =======================
-
 import os
 from pathlib import Path
 import pandas as pd
 
-# Load config
 configfile: "./config/config.yaml"
 
-# Load samples table
 samples = pd.read_csv(config["samples"], index_col="sample", sep='\t')
 
-# Choose cleaned or decontaminated reads based on config
 def get_preprocessed_reads(sample):
     suffix = "decontaminated" if config.get("contaminant_fasta", "") else "cleaned"
     return [
@@ -21,7 +13,6 @@ def get_preprocessed_reads(sample):
         f"{config['output_dir_path']}/{suffix}/{sample}_2.fastq"
     ]
 
-# Define polishing or unpolished output depending on config
 polishing_outputs = expand(
     f"{config['output_dir_path']}/polishing/{{sample}}_polished.fasta",
     sample=samples.index
@@ -30,7 +21,6 @@ polishing_outputs = expand(
     sample=samples.index
 )
 
-# Final workflow targets only (not intermediate files!)
 rule all:
     input:
         expand(
@@ -43,20 +33,15 @@ rule all:
         f"{config['output_dir_path']}/phylogeny/all_samples.tree.png",
         f"{config['output_dir_path']}/qc/multiqc_report.html",
         f"{config['output_dir_path']}/variability/all_samples_windows_var.txt",
-        expand(f"{config['output_dir_path']}/final_consensus/{{sample}}.fasta", sample=samples.index)
+        f"{config['output_dir_path']}/all_samples/all_samples_final.fasta"
 
-
-
-# =======================
-# Included rule files
-# =======================
 
 include: "rules/fastp.smk"
 include: "rules/spades.smk"
 include: "rules/quast.smk"
 include: "rules/normalize_reads.smk"
-include: "rules/assembly_utils.smk"   # Merged: align_assembly, call_concat_consensus, decontamination
-include: "rules/screen_all.smk"       # Merged: screen, screen_kraken, screen_multiqc
+include: "rules/assembly_utils.smk" 
+include: "rules/screen_all.smk"   
 include: "rules/mafft.smk"
 include: "rules/iqtree_vis.smk"
 include: "rules/var.smk"
@@ -64,68 +49,3 @@ include: "rules/multiqc.smk"
 include: "rules/polishing.smk"
 include: "rules/decontamination.smk"
 include: "rules/map_consensus_patch.smk"
-
-# # =======================
-# # Snakemake Workflow Final Snakefile
-# # Fixed version
-# # =======================
-
-# import os
-# from pathlib import Path
-# import pandas as pd
-
-# # Load config
-# configfile: "./config/config.yaml"
-
-# # Load samples table
-# samples = pd.read_csv(config["samples"], index_col="sample", sep='\t')
-
-# # Define outputs for cleaned/decontaminated reads
-# cleaned_outputs = expand(
-#     f"{config['output_dir_path']}/cleaned/{{sample}}_1.fastq",
-#     sample=samples.index
-# )
-
-# decontaminated_outputs = expand(
-#     f"{config['output_dir_path']}/decontaminated/{{sample}}_1.fastq",
-#     sample=samples.index
-# ) if config.get("contaminant_fasta", "") else []
-
-# # Define polishing outputs
-# polishing_outputs = expand(
-#     f"{config['output_dir_path']}/polishing/{{sample}}_polished.fasta",
-#     sample=samples.index
-# ) if config.get("enable_polishing", False) else expand(
-#     f"{config['output_dir_path']}/assembly/{{sample}}/contigs.fasta",
-#     sample=samples.index
-# )
-
-# # Final targets
-# rule all:
-#     input:
-#         cleaned_outputs,
-#         decontaminated_outputs,
-#         expand(
-#             f"{config['output_dir_path']}/normalized/{{sample}}_1.fastq",
-#             sample=samples.index
-#         ),
-#         polishing_outputs,
-#         f"{config['output_dir_path']}/phylogeny/all_samples.tree.png",
-#         f"{config['output_dir_path']}/qc/multiqc_report.html",
-#         f"{config['output_dir_path']}/variability/all_samples_windows_var.txt"
-
-# # =======================
-# # Included rule files
-# # =======================
-
-# include: "rules/fastp.smk"
-# include: "rules/spades.smk"
-# include: "rules/quast.smk"
-# include: "rules/normalize_reads.smk"
-# include: "rules/assembly_utils.smk"
-# include: "rules/screen_all.smk"
-# include: "rules/mafft.smk"
-# include: "rules/iqtree_vis.smk"
-# include: "rules/var.smk"
-# include: "rules/multiqc.smk"
-# include: "rules/polishing.smk"

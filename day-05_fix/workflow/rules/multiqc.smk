@@ -14,7 +14,6 @@ rule multiqc:
         )
     output:
         html = f"{config['output_dir_path']}/qc/multiqc_report.html"
-        # dir = directory(f"{config['output_dir_path']}/qc/multiqc_data")
     conda:
         "../env/multiqc.yaml"
     threads: 1

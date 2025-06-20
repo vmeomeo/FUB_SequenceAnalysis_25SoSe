@@ -1,5 +1,3 @@
-print(expand(samples.at["sample_22", "fq1"]))
-
 rule fastp:
     input:
         r1 = lambda wc: samples.at[wc.sample, "fq1"],

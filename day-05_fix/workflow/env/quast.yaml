@@ -1,6 +1,6 @@
 name: quast
 channels:
-  - conda-forge      # Important: conda-forge first
+  - conda-forge     
   - bioconda
   - defaults
 dependencies:

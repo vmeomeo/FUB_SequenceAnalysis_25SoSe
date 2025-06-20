@@ -1,0 +1,22 @@
+project_name : day-05-SeqAn
+author: "Hang Mai Anh Vo, Baptiste Roizard"
+date: 2025.06.06
+
+output_dir_path: "results"
+create_input_tsv: false
+fastp_flags: "--detect_adapter_for_pe --thread 4 --qualified_quality_phred 15 --length_required 50" # personalize
+
+
+window_size: 100
+step_size: 10
+
+samples: "config/samples.tsv"
+reference_genome: "resources/sequence.fasta"
+kraken_db: "data/kraken2_db"
+contaminant_fasta: "resources/contaminants.fasta" # provide contaminant fasta or "" to skip (optional step)
+bbnorm_flags: "target=50 min=5" #personalize
+enable_polishing: false #set to false to skip polishing (optional step)
+
+# Path to candidate reference FASTA file for all samples
+candidate_references: "resources/candidate_refs.fasta" #provide list of candidate references
+

@@ -1,5 +1,3 @@
-# File: rules/map_consensus_patch.smk
-
 rule make_blast_db:
     input:
         fasta = config["candidate_references"]
@@ -40,21 +38,48 @@ rule extract_best_reference:
         """
         seqtk subseq {input.references} {input.best_hit} > {output.ref_fasta}
         """
+rule index_reference_fasta:
+    input:
+        ref = f"{config['output_dir_path']}/reference/{{sample}}_best_ref.fasta"
+    output:
+        fai = f"{config['output_dir_path']}/reference/{{sample}}_best_ref.fasta.fai"
+    conda:
+        "../env/samtools.yaml"
+    shell:
+        "samtools faidx {input.ref}"
 
 
 rule patch_assembly:
     input:
         contigs = lambda wc: f"{config['output_dir_path']}/polishing/{wc.sample}_polished.fasta" if config.get("enable_polishing", False)
                   else f"{config['output_dir_path']}/assembly/{wc.sample}/contigs.fasta",
-        reference = f"{config['output_dir_path']}/reference/{{sample}}_best_ref.fasta"
+        reference = f"{config['output_dir_path']}/reference/{{sample}}_best_ref.fasta",
+        ref_fai = f"{config['output_dir_path']}/reference/{{sample}}_best_ref.fasta.fai"
     output:
         patched = f"{config['output_dir_path']}/patched/{{sample}}_patched.fasta"
     conda:
         "../env/ragtag.yaml"
+    params:
+        outdir=config['output_dir_path'],
+        sample=lambda wc: wc.sample
     shell:
         """
-        ragtag.py patch {input.reference} {input.contigs} -o {config['output_dir_path']}/patched/{{sample}}
-        cp {config['output_dir_path']}/patched/{{sample}}/ragtag.patch.fasta {output.patched}
+        mkdir -p {params.outdir}/patched/{params.sample}
+        ragtag.py patch -u {input.reference} {input.contigs} -o {params.outdir}/patched/{params.sample} > {params.outdir}/patched/{params.sample}/ragtag.log 2>&1
+
+        outdir={params.outdir}/patched/{params.sample}
+
+        if [ -f $outdir/ragtag.patch.rename.fasta ]; then
+            samtools faidx $outdir/ragtag.patch.rename.fasta
+            cp $outdir/ragtag.patch.rename.fasta {output.patched}
+        elif [ -f $outdir/ragtag.patch.ctg.fasta ]; then
+            samtools faidx $outdir/ragtag.patch.ctg.fasta
+            cp $outdir/ragtag.patch.ctg.fasta {output.patched}
+        else
+            echo "No valid output FASTA found or file is empty in RagTag patch output" >&2
+            cat $outdir/ragtag.log >&2
+            exit 1
+        fi
         """
 
 
@@ -124,3 +149,20 @@ rule final_call_consensus:
         samtools consensus -aa -f fasta -T {input.reference} -@ {threads} \
             -o {output.consensus} {input.bam} > {log} 2>&1
         """
+rule concat_final_consensus:
+    input:
+        expand(
+            f"{config['output_dir_path']}/final_consensus/{{sample}}.fasta",
+            sample=samples.index
+        )
+    output:
+        combined = f"{config['output_dir_path']}/all_samples/all_samples_final.fasta"
+    conda:
+        "../env/concat_consensus.yaml"
+    log:
+        f"{config['output_dir_path']}/logs/concat_final_consensus.log"
+    shell:
+        """
+        workflow/scripts/select_representative_consensus.py {input} {output.combined} > {log} 2>&1
+        """
+

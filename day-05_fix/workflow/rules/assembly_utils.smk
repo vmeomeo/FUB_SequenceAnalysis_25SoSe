@@ -1,5 +1,3 @@
-# --- ALIGN ASSEMBLY RULES --- #
-
 rule align_with_minimap2:
     input:
         assembly = lambda wc: f"{config['output_dir_path']}/polishing/{wc.sample}_polished.fasta"
@@ -50,8 +48,6 @@ rule index_bam:
         samtools index {input.bam} > {log} 2>&1
         """
 
-
-# --- CONSENSUS RULES --- #
 
 rule call_consensus:
     input:
