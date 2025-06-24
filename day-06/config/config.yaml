@@ -11,11 +11,8 @@ window_size: 100
 step_size: 10
 
 samples: "config/samples.tsv"
-reference_genome: "resources/sequence.fasta"
-kraken_db: "data/kraken2_db"
-contaminant_fasta: "resources/contaminants.fasta" # provide contaminant fasta or "" to skip (optional step)
-bbnorm_flags: "target=50 min=5" #personalize
-enable_polishing: false #set to false to skip polishing (optional step)
+ref_genome: resources/Homo_sapiens.GRCh38.dna.chromosome.22.fa.gz
+annotation: resources/Homo_sapiens.GRCh38.114.chr.gtf.gz
 
 # Path to candidate reference FASTA file for all samples
 candidate_references: "resources/candidate_refs.fasta" #provide list of candidate references

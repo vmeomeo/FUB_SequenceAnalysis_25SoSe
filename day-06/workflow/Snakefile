@@ -1,1 +1,28 @@
+import os
+from pathlib import Path
+import pandas as pd
 
+# load samples into table
+
+configfile : "./config/config.yaml"
+samples = pd.read_csv(config["samples"], index_col = "sample", sep ='\t')
+
+def get_preprocessed_reads(sample):
+    suffix = "with_ref_annot" if (config.get("ref_genome", "") and config.get("annotation", "")) else "no_ref_annot"
+    return [f"{config['output_dir_path']}/{suffix}/{sample}_Aligned.sortedByCoord.out.bam"]
+
+
+rule all:
+    input:
+        expand(
+            f"{config['output_dir_path']}/cleaned/{{sample}}_r1.fastq.gz",
+            sample=samples.index
+        ),
+        f"{config['output_dir_path']}/qc/multiqc_report.html",
+        *[get_preprocessed_reads(sample) for sample in samples.index],
+        f"{config['output_dir_path']}/featurecounts/gene_counts.txt"
+
+include: "rules/fastp.smk"
+include: "rules/multiqc.smk"
+include: "rules/star.smk"
+include: "rules/featurecounts.smk"

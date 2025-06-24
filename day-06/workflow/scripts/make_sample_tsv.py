@@ -5,15 +5,15 @@ from pathlib import Path
 # Set this to your directory containing FASTQ files (relative to Snakemake file)
 fastq_dir = Path("data")
 
-# Find all _1.fastq.gz and _2.fastq.gz files
-fq1_files = sorted([f for f in fastq_dir.glob("*_1.fastq.gz")])
-fq2_files = sorted([f for f in fastq_dir.glob("*_2.fastq.gz")])
+# Find all _r1.fastq.gz and _r2.fastq.gz files
+fq1_files = sorted([f for f in fastq_dir.glob("*_r1.fastq.gz")])
+fq2_files = sorted([f for f in fastq_dir.glob("*_r2.fastq.gz")])
 
 # Match by sample name prefix
 samples = []
 for fq1 in fq1_files:
-    sample_name = fq1.name.replace("_1.fastq.gz", "")
-    fq2 = fastq_dir / f"{sample_name}_2.fastq.gz"
+    sample_name = fq1.name.replace("_r1.fastq.gz", "")
+    fq2 = fastq_dir / f"{sample_name}_r2.fastq.gz"
     if fq2.exists():
         samples.append({
             "sample": sample_name,
