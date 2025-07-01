@@ -7,22 +7,27 @@ import pandas as pd
 configfile : "./config/config.yaml"
 samples = pd.read_csv(config["samples"], index_col = "sample", sep ='\t')
 
-def get_preprocessed_reads(sample):
-    suffix = "with_ref_annot" if (config.get("ref_genome", "") and config.get("annotation", "")) else "no_ref_annot"
-    return [f"{config['output_dir_path']}/{suffix}/{sample}_Aligned.sortedByCoord.out.bam"]
+has_reference = bool(config.get("ref_genome", "")) and bool(config.get("annotation", ""))
+
+final_output = []
+if has_reference:
+    final_output.append(f"{config['output_dir_path']}/featurecounts/gene_counts.txt")
+else:
+    final_output.extend(
+        expand(f"{config['output_dir_path']}/quant/trinity_kallisto/{{sample}}", sample=samples.index) +
+        expand(f"{config['output_dir_path']}/quant/trinity_rsem/{{sample}}.isoforms.results", sample=samples.index) +
+        [f"{config['output_dir_path']}/trinity_out/Trinity.fasta"]  # <- note the list brackets here
+    )
 
 
 rule all:
     input:
-        expand(
-            f"{config['output_dir_path']}/cleaned/{{sample}}_r1.fastq.gz",
-            sample=samples.index
-        ),
         f"{config['output_dir_path']}/qc/multiqc_report.html",
-        *[get_preprocessed_reads(sample) for sample in samples.index],
-        f"{config['output_dir_path']}/featurecounts/gene_counts.txt"
+        *final_output
 
 include: "rules/fastp.smk"
 include: "rules/multiqc.smk"
 include: "rules/star.smk"
 include: "rules/featurecounts.smk"
+include: "rules/denovo.smk"
+include: "rules/quant_RSEM_Kallisto.smk"

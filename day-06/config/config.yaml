@@ -6,14 +6,8 @@ output_dir_path: "results"
 create_input_tsv: false
 fastp_flags: "--detect_adapter_for_pe --thread 4 --qualified_quality_phred 15 --length_required 50" # personalize
 
-
-window_size: 100
-step_size: 10
-
 samples: "config/samples.tsv"
-ref_genome: resources/Homo_sapiens.GRCh38.dna.chromosome.22.fa.gz
-annotation: resources/Homo_sapiens.GRCh38.114.chr.gtf.gz
+ref_genome: "" # resources/Homo_sapiens.GRCh38.dna.chromosome.22.fa.gz
+annotation: "" # resources/Homo_sapiens.GRCh38.114.chr.gtf.gz
 
-# Path to candidate reference FASTA file for all samples
-candidate_references: "resources/candidate_refs.fasta" #provide list of candidate references
 

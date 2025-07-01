@@ -1,32 +1,32 @@
 rule decompress_fasta:
     input:
-        "resources/Homo_sapiens.GRCh38.dna.chromosome.22.fa.gz"
+        config['ref_genome']
     output:
-        "resources/Homo_sapiens.GRCh38.dna.chromosome.22.fa"
+        config['ref_genome'].replace('.gz', '')
     shell:
         "gunzip -c {input} > {output}"
 
 rule decompress_gtf:
     input:
-        "resources/Homo_sapiens.GRCh38.114.chr.gtf.gz"
+        config['annotation']
     output:
-        "resources/Homo_sapiens.GRCh38.114.chr.gtf"
+        config['annotation'].replace('.gz', '')
     shell:
         "gunzip -c {input} > {output}"
+
 rule genome_indexing:
     input:
-        fa = "resources/Homo_sapiens.GRCh38.dna.chromosome.22.fa",
-        gtf = "resources/Homo_sapiens.GRCh38.114.chr.gtf"
+        fa = config['ref_genome'].replace('.gz', ''),
+        gtf = config['annotation'].replace('.gz', '')
     output:
         directory("resources/index")
     threads: 4
     conda:
         "../env/star.yaml"
     log:
-        "results/indexing/logs/STAR_genome_indexing.log"
+        f"{config['output_dir_path']}/indexing/logs/STAR_genome_indexing.log"
     shell:
         """
-        mkdir -p {output}
         STAR \
         --runThreadN {threads} \
         --runMode genomeGenerate \
@@ -38,7 +38,7 @@ rule genome_indexing:
         """
 rule genome_mapping:
     input:
-        idx = directory("resources/index"),
+        idx = "resources/index",
         r1 = f"{config['output_dir_path']}/cleaned/{{sample}}_r1.fastq.gz",
         r2 = f"{config['output_dir_path']}/cleaned/{{sample}}_r2.fastq.gz"
     output:

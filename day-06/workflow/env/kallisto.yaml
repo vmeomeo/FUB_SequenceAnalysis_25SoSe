@@ -1,0 +1,6 @@
+name: kallisto-env
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - kallisto=0.46.2
