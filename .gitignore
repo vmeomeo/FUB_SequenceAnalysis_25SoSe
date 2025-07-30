@@ -1,6 +1,8 @@
 ### Data
 data/
 resources/
+busco_downloads/
+*.zip
 
 ### Test file
 *.ipynb
