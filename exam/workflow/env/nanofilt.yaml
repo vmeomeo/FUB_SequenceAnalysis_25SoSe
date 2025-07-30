@@ -1,0 +1,9 @@
+name: nanofilt
+channels:
+  - conda-forge  # Higher priority channel often has better dependency resolution
+  - bioconda
+dependencies:
+  - nanofilt=2.8.0
+  - pandas=1.1.5  # Explicitly add pandas
+  - numpy=1.19.2  # Explicitly add numpy
+  - python=3.7    # NanoFilt works best with Python 3.7

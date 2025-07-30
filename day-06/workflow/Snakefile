@@ -16,7 +16,7 @@ else:
     final_output.extend(
         expand(f"{config['output_dir_path']}/quant/trinity_kallisto/{{sample}}", sample=samples.index) +
         expand(f"{config['output_dir_path']}/quant/trinity_rsem/{{sample}}.isoforms.results", sample=samples.index) +
-        [f"{config['output_dir_path']}/trinity_out/Trinity.fasta"]  # <- note the list brackets here
+        [f"{config['output_dir_path']}/trinity_out/Trinity.fasta"]  
     )
 
 

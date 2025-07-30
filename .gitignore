@@ -1,5 +1,7 @@
 ### Data
 data/
+resources/
+
 ### Test file
 *.ipynb
 .snakemake/

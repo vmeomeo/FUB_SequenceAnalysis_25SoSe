@@ -1,0 +1,16 @@
+name: busco_env
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - busco=5.7.1  # newer version with better dependency resolution
+  - python=3.10
+  - augustus
+  - hmmer
+  - blast
+  - r-base=4.3  # newer R version
+  - r-ggplot2=3.4.4
+  - r-reshape2=1.4.4
+  - r-stringr=1.5.0
+  - libdeflate=1.18  # required by newer R versions

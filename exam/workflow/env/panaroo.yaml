@@ -1,0 +1,44 @@
+# name: panaroo_env
+# channels:
+#   - bioconda
+#   - conda-forge
+#   - defaults
+# dependencies:
+#   - python=3.8
+#   - panaroo=1.2.10
+#   - mafft
+#   - numpy
+#   - scipy
+#   - pandas
+#   - matplotlib
+
+# name: panaroo_env
+# channels:
+#   - conda-forge
+#   - bioconda
+#   - defaults
+# dependencies:
+#   - python=3.9  # Changed from 3.8 to resolve conflicts
+#   - panaroo=1.3.2  # Updated version
+#   - mafft
+#   - numpy>=1.21
+#   - scipy>=1.7
+#   - pandas>=1.3
+#   - matplotlib
+#   - tqdm>=4.62  # Explicitly added
+#   - biopython>=1.79
+
+name: panaroo_env
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - tqdm>=4.60
+  - panaroo=1.2.10
+  - mafft
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib

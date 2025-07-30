@@ -1,0 +1,9 @@
+name: nanoplot
+channels:
+  - conda-forge  # Higher priority for better resolution
+  - bioconda
+dependencies:
+  - nanoplot=1.40.0
+  - pandas=1.3.5   # Explicitly compatible with numpy 1.21
+  - numpy=1.21.6   # Stable version for bioinformatics tools
+  - python=3.8     # Best-supported version for NanoPlot

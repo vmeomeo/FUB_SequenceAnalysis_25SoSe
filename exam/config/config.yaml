@@ -1,0 +1,23 @@
+project_name : day-05-SeqAn
+author: "Hang Mai Anh Vo, Baptiste Roizard"
+date: 2025.06.06
+
+output_dir_path: "results"
+create_input_tsv: false
+fastp_flags: "--detect_adapter_for_pe --thread 4 --qualified_quality_phred 15 --length_required 50" # personalize
+
+samples: "config/samples_set1.tsv" # or "config/samples_set2.tsv"
+blacklist_file: "config/blacklist.tsv"
+
+bakta_db_download: true
+bakta_db_path: "resources/bakta_db/db-light"
+bacteria_odb10: "resources/bacteria_odb10" #lineage gene set
+
+busco_db_download: true
+busco_db_path: "resources/busco"
+bacteria_odb10: "bacteria_odb10"
+
+
+
+
+

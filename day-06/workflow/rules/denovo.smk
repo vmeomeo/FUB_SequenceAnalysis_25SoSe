@@ -23,7 +23,8 @@ rule trinity_merged:
         left = f"{config['output_dir_path']}/merged/all_r1.fastq.gz",
         right = f"{config['output_dir_path']}/merged/all_r2.fastq.gz"
     output:
-        outdir = directory(f"{config['output_dir_path']}/trinity_out")
+        outdir = directory(f"{config['output_dir_path']}/trinity_out"),
+        fasta = f"{config['output_dir_path']}/trinity_out/Trinity.fasta"
     threads: workflow.cores
     conda:
         "../env/trinity.yaml"
@@ -42,8 +43,5 @@ rule trinity_merged:
             > {log} 2>&1
         """
 
-rule expose_trinity_fasta:
-    input:
-        f"{config['output_dir_path']}/trinity_out/Trinity.fasta"
 
 

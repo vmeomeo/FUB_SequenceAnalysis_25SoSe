@@ -1,0 +1,8 @@
+name: porechop_env
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - porechop=0.2.4
+  - python=3.6  # nécessaire pour porechop

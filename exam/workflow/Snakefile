@@ -1,0 +1,77 @@
+import os
+from pathlib import Path
+import pandas as pd
+
+# load samples into table
+
+# configfile : "./config/config.yaml"
+configfile: "config/config.yaml"
+samples = pd.read_csv(config["samples"], index_col = "sample", sep ='\t') # choose set 1 or 2 here
+
+# def get_included_samples():
+
+#     all_samples = samples.index.tolist()
+#     blacklist_file = config.get("blacklist_file", None)
+
+#     if blacklist_file:
+#         try:
+#             blacklist = pd.read_csv(blacklist_file, header=None)[0].tolist()
+#         except Exception:
+#             print("Warning: Could not read blacklist file. Using all samples.")
+#             blacklist = []
+#     else:
+#         blacklist = []
+
+#     return [s for s in all_samples if s not in blacklist]
+
+# set1 = bool(config["samples"] == "config/samples_set1.tsv")
+
+# final_output = []
+# if set1: # if the config has set 1
+#     final_output.append(f"{config['output_dir_path']}/qc/multiqc_report.html")
+#     # final_output.append(f"{config['output_dir_path']}/qc/nanoplot/sample1")
+#     # final_output.append(f"{config['output_dir_path']}/cleaned/sample1_porechop.fastq") # long reads porechop
+#     # final_output.append(f"{config['output_dir_path']}/filtered/sample1_filtered.fastq") # nanofilt
+#     # final_output.append(f"{config['output_dir_path']}/qc/nanoplot/sample1/NanoPlot-report.html") # nanoplot
+#     final_output.extend(expand(f"{config['output_dir_path']}/cleaned/{{sample}}_r1.fastq.gz", sample=samples.index))
+#      # short reads fastp
+# else: #do the set 2 steps
+#     final_output.extend(
+#     )
+
+set1 = bool(config["samples"] == "config/samples_set1.tsv")
+
+# Conditional final outputs
+final_output = []
+if set1:
+    final_output.append(f"{config['output_dir_path']}/qc/multiqc_report.html")
+    final_output.extend(expand(f"{config['output_dir_path']}/cleaned/{{sample}}_r1.fastq.gz", sample=samples.index))
+    final_output.extend(expand(f"{config['output_dir_path']}/assembly/{{sample}}/assembly.fasta", sample=samples.index)) # sample=get_included_samples()))
+    final_output.extend(expand(f"{config['output_dir_path']}/annotation/{{sample}}/assembly.gff3", sample=samples.index))# sample=get_included_samples()))
+    final_output.extend(expand(f"{config['output_dir_path']}/annotation/{{sample}}/assembly.faa", sample=samples.index)) #sample=get_included_samples()))
+    final_output.append(f"{config['output_dir_path']}/qc/multiqc_assembly_report.html") #multiqc on assembly (quast+busco)
+    #final_output.append(f"{config['output_dir_path']}/pangenome/panaroo/gene_presence_absence.csv") #panaroo
+    final_output.append(f"{config['output_dir_path']}/pangenome/panaroo")
+    # Optionally add Bakta DB download target if enabled
+    if config.get("bakta_db_download", False):
+        final_output.append(config["bakta_db_path"])  # ensure bakta_db_path exists in config.yaml
+
+
+    # Optionally add BUSCO DB download target
+    if config.get("busco_db_download", False):
+        final_output.append(f"{config['busco_db_path']}/.downloaded")
+
+else:
+    final_output.extend(
+    )
+
+
+rule all:
+    input:
+        *final_output
+
+include: "rules/qc.smk"
+include: "rules/unicycler.smk"
+include: "rules/bakta.smk"
+include: "rules/assembly_qc.smk"
+include: "rules/panaroo.smk"
