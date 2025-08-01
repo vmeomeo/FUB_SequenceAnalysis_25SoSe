@@ -1,15 +1,16 @@
+#WORKING almost
+# name: panaroo_env
+# channels:
+#   - conda-forge
+#   - bioconda
+# dependencies:
+#   - python=3.7
+#   - panaroo
 name: panaroo_env
 channels:
+  - conda-forge  # Higher priority for biopython
   - bioconda
-  - conda-forge
-  - defaults
 dependencies:
-  - python=3.8
-  - tqdm>=4.60
-  - panaroo=1.2.10
-  - mafft
-  - numpy
-  - scipy
-  - pandas
-  - matplotlib
-
+  - python=3.10 #3.7
+  - panaroo=1.5.2  # Keep unversioned to maintain working state
+  - biopython=1.80 #1.76  # Add this line (version matches panaroo's requirements)

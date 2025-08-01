@@ -1,0 +1,6 @@
+name: mob_suite
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - mob_suite

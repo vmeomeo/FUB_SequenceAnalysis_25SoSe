@@ -8,6 +8,8 @@ fastp_flags: "--detect_adapter_for_pe --thread 4 --qualified_quality_phred 15 --
 
 samples: "config/samples_set1.tsv" # or "config/samples_set2.tsv"
 blacklist_file: "config/blacklist.tsv"
+kraken_db: "data/kraken2_db"
+contaminant_fasta: "resources/contaminants.fasta"
 
 bakta_db_download: true
 bakta_db_path: "resources/bakta_db/db-light"
@@ -16,6 +18,11 @@ bacteria_odb10: "resources/bacteria_odb10" #lineage gene set
 busco_db_download: true
 busco_db_path: "resources/busco"
 bacteria_odb10: "bacteria_odb10"
+
+run_mlst: true
+run_resistance: true
+run_virulence: true
+run_plasmid: true
 
 
 

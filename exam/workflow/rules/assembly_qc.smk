@@ -59,9 +59,12 @@ rule busco:
 rule assembly_multiqc:
     input:
         quast_dirs = expand(f"{config['output_dir_path']}/qc/quast/{{sample}}", sample=samples.index),
-        busco_summaries = expand(
-            f"{config['output_dir_path']}/qc/busco/{{sample}}/{{sample}}/short_summary.specific.bacteria_odb10.{{sample}}.txt",
-            sample=samples.index
+        # busco_summaries = expand(
+        #     f"{config['output_dir_path']}/qc/busco/{{sample}}/{{sample}}/short_summary.specific.bacteria_odb10.{{sample}}.txt",
+        #     sample=samples.index
+        # )
+        busco_dirs = expand(
+            f"{config['output_dir_path']}/qc/busco/{{sample}}/{{sample}}", sample=samples.index
         )
     output:
         html = f"{config['output_dir_path']}/qc/multiqc_assembly_report.html"
@@ -74,5 +77,9 @@ rule assembly_multiqc:
         f"{config['output_dir_path']}/qc/logs/multiqc_assembly.log"
     shell:
         """
-        multiqc {input.quast_dirs} {input.busco_summaries} -o {params.outdir} -n multiqc_assembly_report > {log} 2>&1
+        multiqc {input.quast_dirs} {input.busco_dirs} -o {params.outdir} -n multiqc_assembly_report > {log} 2>&1
         """
+        
+        # rm -f {params.outdir}/multiqc_assembly_report*.html
+        # multiqc {input.quast_dirs} {input.busco_summaries} -o {params.outdir} -n multiqc_assembly_report > {log} 2>&1
+        # """

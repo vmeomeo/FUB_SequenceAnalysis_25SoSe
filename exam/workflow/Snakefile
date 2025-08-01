@@ -41,6 +41,12 @@ samples = pd.read_csv(config["samples"], index_col = "sample", sep ='\t') # choo
 
 set1 = bool(config["samples"] == "config/samples_set1.tsv")
 
+def get_preprocessed_reads(sample):
+    suffix = "decontaminated" if config.get("contaminant_fasta", "") else "cleaned"
+    return [
+        f"{config['output_dir_path']}/{suffix}/{sample}_r1.fastq.gz",
+        f"{config['output_dir_path']}/{suffix}/{sample}_r2.fastq.gz"
+    ]
 # Conditional final outputs
 final_output = []
 if set1:
@@ -51,7 +57,7 @@ if set1:
     final_output.extend(expand(f"{config['output_dir_path']}/annotation/{{sample}}/assembly.faa", sample=samples.index)) #sample=get_included_samples()))
     final_output.append(f"{config['output_dir_path']}/qc/multiqc_assembly_report.html") #multiqc on assembly (quast+busco)
     #final_output.append(f"{config['output_dir_path']}/pangenome/panaroo/gene_presence_absence.csv") #panaroo
-    final_output.append(f"{config['output_dir_path']}/pangenome/panaroo")
+    final_output.append(f"{config['output_dir_path']}/pangenome/panaroo_test")
     # Optionally add Bakta DB download target if enabled
     if config.get("bakta_db_download", False):
         final_output.append(config["bakta_db_path"])  # ensure bakta_db_path exists in config.yaml
@@ -60,6 +66,19 @@ if set1:
     # Optionally add BUSCO DB download target
     if config.get("busco_db_download", False):
         final_output.append(f"{config['busco_db_path']}/.downloaded")
+    
+    final_output.extend([get_preprocessed_reads(sample) for sample in samples.index])
+    final_output.append(f"{config['output_dir_path']}/phylogeny/panaroo_tree.png")
+    #4 steps to add after iqtree
+
+    # if config.get("run_mlst", False):
+    #     final_output.append("results/mlst/{sample}.tsv")
+    # if config.get("run_resistance", False):
+    #     final_output.append("results/abricate/card/{sample}.tsv")
+    # if config.get("run_virulence", False):
+    #     final_output.append("results/abricate/vfdb/{sample}.tsv")
+    # if config.get("run_plasmid", False):
+    #     final_output.append("results/plasmids/{sample}")
 
 else:
     final_output.extend(
@@ -75,3 +94,6 @@ include: "rules/unicycler.smk"
 include: "rules/bakta.smk"
 include: "rules/assembly_qc.smk"
 include: "rules/panaroo.smk"
+include: "rules/screen_all.smk"
+include: "rules/decontamination.smk"
+include: "rules/iqtree_vis.smk"

@@ -1,0 +1,8 @@
+name: filter_env
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.7
+  - biopython=1.76
+  - gffutils=0.10.1

@@ -13,7 +13,8 @@ rule bakta:
         f"{config['output_dir_path']}/assembly/{{sample}}/assembly.fasta"
     output:
         gff = f"{config['output_dir_path']}/annotation/{{sample}}/assembly.gff3",
-        faa = f"{config['output_dir_path']}/annotation/{{sample}}/assembly.faa"
+        faa = f"{config['output_dir_path']}/annotation/{{sample}}/assembly.faa",
+        ffn = f"{config['output_dir_path']}/annotation/{{sample}}/assembly.ffn"
     log:
         f"{config['output_dir_path']}/logs/bakta/{{sample}}.log"
     threads: workflow.cores
