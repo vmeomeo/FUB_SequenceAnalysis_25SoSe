@@ -16,12 +16,13 @@ rule panaroo:
     input:
         # gffs = expand("results/annotation/{sample}/assembly.filtered.gff3", sample=samples.index)
         # gffs = expand(f"{config['output_dir_path']}/annotation/{{sample}}/assembly.gff3", sample=samples.index)
+        gffs = expand(f"{config['output_dir_path']}/annotation/{{sample}}/{{sample}}.gff3", sample=samples.index)
         # Test
-        gffs = expand(f"{config['output_dir_path']}/panaroo_input/{{sample}}.gff3", sample=samples.index)
+        # gffs = expand(f"{config['output_dir_path']}/panaroo_input/{{sample}}.gff3", sample=samples.index)
     output:
-        # directory(f"{config['output_dir_path']}/pangenome/panaroo")
+        directory(f"{config['output_dir_path']}/pangenome/panaroo")
         # Test
-        directory(f"{config['output_dir_path']}/pangenome/panaroo_test")
+        # directory(f"{config['output_dir_path']}/pangenome/panaroo_test")
     # log:
         # f"{config['output_dir_path']}/logs/panaroo/{{sample}}.log"
     conda: "../env/panaroo.yaml"

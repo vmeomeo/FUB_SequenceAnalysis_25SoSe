@@ -57,7 +57,7 @@ if set1:
     final_output.extend(expand(f"{config['output_dir_path']}/annotation/{{sample}}/assembly.faa", sample=samples.index)) #sample=get_included_samples()))
     final_output.append(f"{config['output_dir_path']}/qc/multiqc_assembly_report.html") #multiqc on assembly (quast+busco)
     #final_output.append(f"{config['output_dir_path']}/pangenome/panaroo/gene_presence_absence.csv") #panaroo
-    final_output.append(f"{config['output_dir_path']}/pangenome/panaroo_test")
+    final_output.append(f"{config['output_dir_path']}/pangenome/panaroo")
     # Optionally add Bakta DB download target if enabled
     if config.get("bakta_db_download", False):
         final_output.append(config["bakta_db_path"])  # ensure bakta_db_path exists in config.yaml

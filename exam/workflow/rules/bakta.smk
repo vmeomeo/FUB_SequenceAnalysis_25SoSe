@@ -10,7 +10,7 @@ rule download_bakta_db:
 
 rule bakta:
     input:
-        f"{config['output_dir_path']}/assembly/{{sample}}/assembly.fasta"
+        f"{config['output_dir_path']}/assembly/{{sample}}/{{sample}}.fasta"
     output:
         gff = f"{config['output_dir_path']}/annotation/{{sample}}/assembly.gff3",
         faa = f"{config['output_dir_path']}/annotation/{{sample}}/assembly.faa",
@@ -27,4 +27,12 @@ rule bakta:
         "bakta --db {params.db} results/assembly/{wildcards.sample}/assembly.fasta "
         "--output {params.outdir}/annotation/{wildcards.sample} "
         "--threads {threads} --force &> \"{log}\""
+
+rule change_assembly_name_bakta:
+    input:
+        assembly = f"{config['output_dir_path']}/annotation/{{sample}}/assembly.gff3"
+    output:
+        assembly = f"{config['output_dir_path']}/annotation/{{sample}}/{{sample}}.gff3"
+    script:
+        "../scripts/change_assembly_name.py"
 

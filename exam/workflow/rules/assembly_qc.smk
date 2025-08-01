@@ -1,6 +1,6 @@
 rule quast:
     input: 
-        assembly = f"{config['output_dir_path']}/assembly/{{sample}}/assembly.fasta"
+        assembly = f"{config['output_dir_path']}/assembly/{{sample}}/{{sample}}.fasta"
     output:
         assembly_qc = directory(f"{config['output_dir_path']}/qc/quast/{{sample}}")
     conda:
