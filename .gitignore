@@ -25,6 +25,7 @@ day-02/archive/
 
 # Output directories
 results/
+results_old/
 
 # Temporary files
 *.tmp

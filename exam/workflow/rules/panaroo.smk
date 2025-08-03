@@ -20,7 +20,8 @@ rule panaroo:
         # Test
         # gffs = expand(f"{config['output_dir_path']}/panaroo_input/{{sample}}.gff3", sample=samples.index)
     output:
-        directory(f"{config['output_dir_path']}/pangenome/panaroo")
+        dir = directory(f"{config['output_dir_path']}/pangenome/panaroo"),
+        core = f"{config['output_dir_path']}/pangenome/panaroo/core_gene_alignment.aln"
         # Test
         # directory(f"{config['output_dir_path']}/pangenome/panaroo_test")
     # log:
@@ -30,7 +31,7 @@ rule panaroo:
     shell:
         """
         panaroo -i {input.gffs} \
-                -o {output} \
+                -o {output.dir} \
                 -t {threads} \
                 --clean-mode strict \
                 --merge_paralogs \

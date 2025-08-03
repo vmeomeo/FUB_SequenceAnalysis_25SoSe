@@ -43,20 +43,17 @@ set1 = bool(config["samples"] == "config/samples_set1.tsv")
 
 def get_preprocessed_reads(sample):
     suffix = "decontaminated" if config.get("contaminant_fasta", "") else "cleaned"
+    extension = "fastq" if config.get("contaminant_fasta", "") else "fastq.gz"
+    # Return the paths for the preprocessed reads
     return [
-        f"{config['output_dir_path']}/{suffix}/{sample}_r1.fastq.gz",
-        f"{config['output_dir_path']}/{suffix}/{sample}_r2.fastq.gz"
+        f"{config['output_dir_path']}/{suffix}/{sample}_r1.{extension}",
+        f"{config['output_dir_path']}/{suffix}/{sample}_r2.{extension}"
     ]
 # Conditional final outputs
 final_output = []
 if set1:
     final_output.append(f"{config['output_dir_path']}/qc/multiqc_report.html")
-    final_output.extend(expand(f"{config['output_dir_path']}/cleaned/{{sample}}_r1.fastq.gz", sample=samples.index))
-    final_output.extend(expand(f"{config['output_dir_path']}/assembly/{{sample}}/assembly.fasta", sample=samples.index)) # sample=get_included_samples()))
-    final_output.extend(expand(f"{config['output_dir_path']}/annotation/{{sample}}/assembly.gff3", sample=samples.index))# sample=get_included_samples()))
-    final_output.extend(expand(f"{config['output_dir_path']}/annotation/{{sample}}/assembly.faa", sample=samples.index)) #sample=get_included_samples()))
     final_output.append(f"{config['output_dir_path']}/qc/multiqc_assembly_report.html") #multiqc on assembly (quast+busco)
-    #final_output.append(f"{config['output_dir_path']}/pangenome/panaroo/gene_presence_absence.csv") #panaroo
     final_output.append(f"{config['output_dir_path']}/pangenome/panaroo")
     # Optionally add Bakta DB download target if enabled
     if config.get("bakta_db_download", False):
@@ -69,16 +66,26 @@ if set1:
     
     final_output.extend([get_preprocessed_reads(sample) for sample in samples.index])
     final_output.append(f"{config['output_dir_path']}/phylogeny/panaroo_tree.png")
-    #4 steps to add after iqtree
 
-    # if config.get("run_mlst", False):
-    #     final_output.append("results/mlst/{sample}.tsv")
-    # if config.get("run_resistance", False):
-    #     final_output.append("results/abricate/card/{sample}.tsv")
-    # if config.get("run_virulence", False):
-    #     final_output.append("results/abricate/vfdb/{sample}.tsv")
-    # if config.get("run_plasmid", False):
-    #     final_output.append("results/plasmids/{sample}")
+    # 4 steps to add after iqtree (4 database downloads)
+
+    if config.get("run_mlst", False) and config.get("mlst_db_path", ""):
+        final_output.append(f"{config['mlst_db_path']}/.downloaded")
+        final_output.extend(expand(f"{config['output_dir_path']}/mlst/{{sample}}.tsv",sample=samples.index))
+
+    if config.get("run_resistance", False) and config.get("abricate_db_path_card", ""):
+        final_output.append(f"{config['abricate_db_path_card']}/card/.downloaded")
+        final_output.extend(expand(f"{config['output_dir_path']}/abricate/card/{{sample}}.tsv", sample=samples.index))
+
+    if config.get("run_virulence", False) and config.get("abricate_db_path_vfdb", ""):
+        final_output.append(f"{config['abricate_db_path_vfdb']}/vfdb/.downloaded")
+        final_output.extend(expand(f"{config['output_dir_path']}/abricate/vfdb/{{sample}}.tsv", sample=samples.index))
+
+    if config.get("run_plasmid", False) and config.get("mob_suite_db_path", ""):
+        final_output.append(config["mob_suite_db_path"])
+        final_output.extend(expand(f"{config['output_dir_path']}/plasmids/{{sample}}", sample=samples.index))
+    #ADD FINAL AGGREGATE REPORTS
+    #final_output.append(f"{config['output_dir_path']}/summary/combined_report.xlsx")
 
 else:
     final_output.extend(
@@ -97,3 +104,4 @@ include: "rules/panaroo.smk"
 include: "rules/screen_all.smk"
 include: "rules/decontamination.smk"
 include: "rules/iqtree_vis.smk"
+include: "rules/optional.smk"

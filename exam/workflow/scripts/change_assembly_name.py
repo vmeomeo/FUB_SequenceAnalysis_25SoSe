@@ -12,5 +12,9 @@ for sample in os.listdir(parent_dir):
                 old_path = os.path.join(sample_dir, fname)
                 new_fname = fname.replace("assembly", sample, 1)
                 new_path = os.path.join(sample_dir, new_fname)
-                print(f"Renaming: {old_path} -> {new_path}")
-                os.rename(old_path, new_path)
+                
+                if os.path.exists(old_path):
+                    print(f"Renaming: {old_path} -> {new_path}")
+                    os.rename(old_path, new_path)
+                else:
+                    print(f"Skipping: {old_path} not found.")

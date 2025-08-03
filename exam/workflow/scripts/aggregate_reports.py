@@ -1,8 +1,7 @@
 import pandas as pd
 import os
-from snakemake import input, output, log
 
-log_file = open(log[0], "w")
+log_file = open(snakemake.log[0], "w")
 
 def concat_tables(files, source):
     dfs = []
@@ -19,15 +18,19 @@ def concat_tables(files, source):
     else:
         return pd.DataFrame()
 
-# Load all modules
-mlst_df = concat_tables(snakemake.input.mlst, "mlst")
-card_df = concat_tables(snakemake.input.card, "card")
-vfdb_df = concat_tables(snakemake.input.vfdb, "vfdb")
-mob_df  = concat_tables(snakemake.input.mob, "mob")
-
-# Write to Excel with multiple sheets
 with pd.ExcelWriter(snakemake.output.summary) as writer:
-    mlst_df.to_excel(writer, sheet_name="MLST", index=False)
-    card_df.to_excel(writer, sheet_name="Resistance_CARD", index=False)
-    vfdb_df.to_excel(writer, sheet_name="Virulence_VFDB", index=False)
-    mob_df.to_excel(writer, sheet_name="Plasmids", index=False)
+    if "mlst" in snakemake.input:
+        mlst_df = concat_tables(snakemake.input.mlst, "mlst")
+        mlst_df.to_excel(writer, sheet_name="MLST", index=False)
+
+    if "card" in snakemake.input:
+        card_df = concat_tables(snakemake.input.card, "card")
+        card_df.to_excel(writer, sheet_name="Resistance_CARD", index=False)
+
+    if "vfdb" in snakemake.input:
+        vfdb_df = concat_tables(snakemake.input.vfdb, "vfdb")
+        vfdb_df.to_excel(writer, sheet_name="Virulence_VFDB", index=False)
+
+    if "mob" in snakemake.input:
+        mob_df = concat_tables(snakemake.input.mob, "mob")
+        mob_df.to_excel(writer, sheet_name="Plasmids", index=False)

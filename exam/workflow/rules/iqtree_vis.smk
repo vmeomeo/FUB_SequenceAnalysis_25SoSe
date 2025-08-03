@@ -1,8 +1,8 @@
 rule iqtree:
     input:
-        # alignment = f"{config['output_dir_path']}/pangenome/panaroo/core_gene_alignment.aln"
+        alignment = f"{config['output_dir_path']}/pangenome/panaroo/core_gene_alignment.aln"
         # Test
-        alignment = f"{config['output_dir_path']}/pangenome/panaroo_test/core_gene_alignment.aln"
+        # alignment = f"{config['output_dir_path']}/pangenome/panaroo_test/core_gene_alignment.aln"
     output:
         treefile = f"{config['output_dir_path']}/phylogeny/panaroo_tree.treefile"
     threads: workflow.cores

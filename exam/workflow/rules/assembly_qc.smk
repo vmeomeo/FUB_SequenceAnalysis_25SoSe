@@ -35,10 +35,11 @@ rule download_busco_db:
 
 rule busco:
     input:
-        fasta = f"{config['output_dir_path']}/assembly/{{sample}}/assembly.fasta",
+        fasta = f"{config['output_dir_path']}/assembly/{{sample}}/{{sample}}.fasta",
         db_marker = f"{config['busco_db_path']}/.downloaded"
     output:
-        summary = f"{config['output_dir_path']}/qc/busco/{{sample}}/{{sample}}/short_summary.specific.bacteria_odb10.{{sample}}.txt"
+        summary = f"{config['output_dir_path']}/qc/busco/{{sample}}/{{sample}}/short_summary.specific.bacteria_odb10.{{sample}}.txt",
+        busco_dirs = directory(f"{config['output_dir_path']}/qc/busco/{{sample}}/{{sample}}")
     conda:
         "../env/busco.yaml"
     params:

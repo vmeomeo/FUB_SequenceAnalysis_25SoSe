@@ -4,7 +4,7 @@ date: 2025.06.06
 
 output_dir_path: "results"
 create_input_tsv: false
-fastp_flags: "--detect_adapter_for_pe --thread 4 --qualified_quality_phred 15 --length_required 50" # personalize
+fastp_flags: "--detect_adapter_for_pe --thread 4 --qualified_quality_phred 15 --length_required 50" # personalize, other:  --cut_front --cut_tail --cut_window_size 4 --cut_mean_quality 20
 
 samples: "config/samples_set1.tsv" # or "config/samples_set2.tsv"
 blacklist_file: "config/blacklist.tsv"
@@ -20,10 +20,14 @@ busco_db_path: "resources/busco"
 bacteria_odb10: "bacteria_odb10"
 
 run_mlst: true
-run_resistance: true
-run_virulence: true
-run_plasmid: true
+run_resistance: false
+run_virulence: false
+run_plasmid: false
 
+mlst_db_path: "resources/mlst_db"
+abricate_db_path_card: "resources/abricate_db"
+abricate_db_path_vfdb: "resources/abricate_db"
+mob_suite_db_path: "resources/mob_suite_db"
 
 
 

@@ -25,8 +25,8 @@ rule decontaminate_reads:
             "1.bt2", "2.bt2", "3.bt2", "4.bt2", "rev.1.bt2", "rev.2.bt2"
         ])
     output:
-        r1_clean = f"{config['output_dir_path']}/decontaminated/{{sample}}_r1.fastq.gz",
-        r2_clean = f"{config['output_dir_path']}/decontaminated/{{sample}}_r2.fastq.gz"
+        r1_clean = f"{config['output_dir_path']}/decontaminated/{{sample}}_r1.fastq",
+        r2_clean = f"{config['output_dir_path']}/decontaminated/{{sample}}_r2.fastq"
     conda:
         "../env/bowtie2.yaml"
     threads: workflow.cores
