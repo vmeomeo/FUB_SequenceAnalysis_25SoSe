@@ -1,6 +1,22 @@
+# name: abricate
+# channels:
+#   - bioconda
+#   - conda-forge
+# dependencies:
+#   - abricate
 name: abricate
 channels:
   - bioconda
   - conda-forge
 dependencies:
   - abricate
+  - blast >=2.7.0
+  - any2fasta
+  - perl
+  - perl-json
+  - perl-path-tiny
+  - perl-lwp-simple
+  - perl-bioperl
+  - git
+  - unzip
+  - gzip

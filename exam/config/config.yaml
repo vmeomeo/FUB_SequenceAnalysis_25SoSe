@@ -20,11 +20,12 @@ busco_db_path: "resources/busco"
 bacteria_odb10: "bacteria_odb10"
 
 run_mlst: true
-run_resistance: false
-run_virulence: false
-run_plasmid: false
+run_resistance: true
+run_virulence: true
+run_plasmid: true
 
-mlst_db_path: "resources/mlst_db"
+mlst_db_path: "" #resources/mlst_db
+mlst_scheme: "klebsiella" # can change based on your data (e.g., "salmonella", "e_coli", etc.)
 abricate_db_path_card: "resources/abricate_db"
 abricate_db_path_vfdb: "resources/abricate_db"
 mob_suite_db_path: "resources/mob_suite_db"

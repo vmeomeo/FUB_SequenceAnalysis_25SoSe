@@ -69,8 +69,8 @@ if set1:
 
     # 4 steps to add after iqtree (4 database downloads)
 
-    if config.get("run_mlst", False) and config.get("mlst_db_path", ""):
-        final_output.append(f"{config['mlst_db_path']}/.downloaded")
+    if config.get("run_mlst", False):
+        # final_output.append(f"{config['mlst_db_path']}/.downloaded")
         final_output.extend(expand(f"{config['output_dir_path']}/mlst/{{sample}}.tsv",sample=samples.index))
 
     if config.get("run_resistance", False) and config.get("abricate_db_path_card", ""):

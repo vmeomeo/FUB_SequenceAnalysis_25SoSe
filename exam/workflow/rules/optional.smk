@@ -1,3 +1,9 @@
+with open("config/mlst_default_db.txt","r") as f:
+    string = f.read()
+mlst_db = string.split(" ")
+if config['mlst_scheme'] not in mlst_db:
+    raise ValueError(f"MLST scheme '{config['mlst_scheme']}' not found in the default database. Please provide a valid scheme or find the data for your organism on https://pubmlst.org/. You can use the 'mlst_db_path' in the config to point to a custom database. If not provided, the default database will be used. If no data is available for your organism, you can set 'run_mlst' to false in the config file to skip this step.")
+
 # rule download_mlst_db:
 #     output:
 #         touch(f"{config['mlst_db_path']}/.downloaded")
@@ -7,23 +13,10 @@
 #         "../env/mlst.yaml"
 #     shell:
 #         """
-#         mlst --update-db > {log} 2>&1
+#         # This forces database initialization if not already present
+#         mlst --check > {log} 2>&1 || true  # --check verifies DBs exist
 #         touch {output}
 #         """
-
-rule download_mlst_db:
-    output:
-        touch(f"{config['mlst_db_path']}/.downloaded")
-    log:
-        f"{config['output_dir_path']}/logs/mlst/download_mlst_db.log"
-    conda:
-        "../env/mlst.yaml"
-    shell:
-        """
-        # This forces database initialization if not already present
-        mlst --check > {log} 2>&1 || true  # --check verifies DBs exist
-        touch {output}
-        """
 
 rule download_abricate_card_db:
     output:
@@ -65,19 +58,39 @@ rule download_mob_suite_db:
         mob_init --outdir {output} > {log} 2>&1
         """
 
+# rule mlst:
+#     input:
+#         fasta = f"{config['output_dir_path']}/assembly/{{sample}}/{{sample}}.fasta",
+#         db_flag = f"{config['mlst_db_path']}/.downloaded"
+#     output:
+#         tsv = f"{config['output_dir_path']}/mlst/{{sample}}.tsv"
+#     log:
+#         f"{config['output_dir_path']}/mlst/{{sample}}.log"
+#     conda:
+#         "../env/mlst.yaml"
+#     params:
+#         scheme = config['mlst_scheme']
+#     shell:
+#         """
+#         mlst --scheme "{params.scheme}" {input.fasta} > {output.tsv} 2> {log}
+#         """
+
 rule mlst:
     input:
-        fasta = f"{config['output_dir_path']}/assembly/{{sample}}/{{sample}}.fasta",
-        db_flag = f"{config['mlst_db_path']}/.downloaded"
+        fasta = f"{config['output_dir_path']}/assembly/{{sample}}/{{sample}}.fasta"
     output:
         tsv = f"{config['output_dir_path']}/mlst/{{sample}}.tsv"
     log:
         f"{config['output_dir_path']}/mlst/{{sample}}.log"
     conda:
         "../env/mlst.yaml"
+    params:
+        scheme = config['mlst_scheme'],
+        db_dir = config.get('mlst_db_path', '')  # Use default if not specified
     shell:
         """
-        mlst --scheme "Klebsiella_pneumoniae" {input.fasta} > {output.tsv} 2> {log}
+        mlst --scheme "{params.scheme}" \
+             {input.fasta} > {output.tsv} 2> {log}
         """
 
 rule abricate_card:
@@ -122,7 +135,7 @@ rule mob_suite:
         "../env/mob_suite.yaml"
     shell:
         """
-        mob_recon --infile {input.fasta} --outdir {output} --db {input.db_dir} > {log} 2>&1
+        mob_recon -u --infile {input.fasta} --outdir {output} --db {input.db_dir} > {log} 2>&1
         """
 
 def get_aggregate_inputs():
