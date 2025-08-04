@@ -24,9 +24,11 @@ project/
 │   ├── SET1/                  # Contains raw FASTQ files for Set 1
 │   └── SET2/                  # Contains raw FASTQ files for Set 2
 ├── resources/                 # Databases (e.g. Bakta, BUSCO, etc.)
-├── workflow/                  # Snakemake rules
+├── workflow/  
+│   ├── env                    # Conda environment configurations for each rule
+│   ├── rules                  # Snakemake rules
 │   ├── scripts/               # Helper scripts (see below)
-│   └── SET2/                  # Contains raw FASTQ files for Set 2
+│   └── Snakefile              # Main snakemake file
 ├── results/                   # Output directory (auto-created)
 └── README.md                  # Tutorial on how to use this workflow
 ```
