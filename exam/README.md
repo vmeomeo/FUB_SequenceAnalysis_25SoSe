@@ -44,7 +44,7 @@ Edit `config.yaml` to adjust:
 
 ## 🧾 Creating Sample Sheets
 
-Use the script [`scripts/make_sample_tsv.py`](scripts/make_sample_tsv.py) to automatically generate TSV files for your datasets.
+Use the script [`scripts/make_sample_tsv.py`](workflow/scripts/make_sample_tsv.py) to automatically generate TSV files for your datasets.
 
 Run:
 
