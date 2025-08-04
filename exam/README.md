@@ -89,21 +89,6 @@ snakemake --use-conda --cores 16
 
 ---
 
-## 🧪 Available Scripts
-
-Located in the [`scripts/`](scripts/) folder:
-
-| Script                              | Description |
-|-------------------------------------|-------------|
-| `make_sample_tsv.py`               | Generates TSV sample sheets for Set1/Set2 automatically. |
-| `change_assembly_name.py`          | Renames annotation files (e.g., `assembly.gff3 → sample.gff3`) for compatibility. |
-| `change_assembly_name_fasta.py`    | Renames Unicycler output `assembly.fasta` to `{sample}.fasta`. |
-| `check_invalid_genes.py`           | Validates gene annotations and flags issues. |
-| `filter_transl_except.py`          | Filters translated proteins with specific conditions. |
-| `aggregate_reports.py`             | Collects and combines report outputs (under development). |
-
----
-
 ## 📚 Notes
 
 - **Blacklist**: Optional. If you want to exclude samples, create `config/sample_blacklist.tsv` with a `sample` column.
