@@ -45,6 +45,8 @@ rule busco:
     params:
         lineage = config["bacteria_odb10"],
         outdir = config['output_dir_path']
+    threads:
+        workflow.cores
     shell:
         """
         busco -i {input.fasta} \
@@ -59,13 +61,13 @@ rule busco:
 
 rule assembly_multiqc:
     input:
-        quast_dirs = expand(f"{config['output_dir_path']}/qc/quast/{{sample}}", sample=samples.index),
+        quast_dirs = expand(f"{config['output_dir_path']}/qc/quast/{{sample}}", sample=get_included_samples()),
         # busco_summaries = expand(
         #     f"{config['output_dir_path']}/qc/busco/{{sample}}/{{sample}}/short_summary.specific.bacteria_odb10.{{sample}}.txt",
         #     sample=samples.index
         # )
         busco_dirs = expand(
-            f"{config['output_dir_path']}/qc/busco/{{sample}}/{{sample}}", sample=samples.index
+            f"{config['output_dir_path']}/qc/busco/{{sample}}/{{sample}}", sample=get_included_samples()
         )
     output:
         html = f"{config['output_dir_path']}/qc/multiqc_assembly_report.html"

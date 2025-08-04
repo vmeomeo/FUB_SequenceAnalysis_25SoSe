@@ -1,3 +1,4 @@
+# TL;DR
 ### How to run snakemake?
 
 1. Go to directory outside 'workflow' 1 level
@@ -7,3 +8,100 @@
 
 3. If there are no errors, run (you can change the number of cores)
 ```snakemake --use-conda --cores 16```
+
+This Snakemake pipeline performs quality control, hybrid or short-read-only assembly, annotation, and genomic feature prediction for bacterial samples (e.g. *Klebsiella pneumoniae*). It supports both short reads (Illumina) and long reads (Nanopore) depending on your dataset.
+
+---
+# Detail on the workflow
+## 📁 Directory Structure
+
+```
+project/
+├── config/
+│   ├── samples_set1.tsv       # Created by script (for long+short reads)
+│   └── samples_set2.tsv       # Created by script (for short reads only)
+├── data/
+│   ├── SET1/                  # Contains raw FASTQ files for Set 1
+│   └── SET2/                  # Contains raw FASTQ files for Set 2
+├── resources/                # Databases (e.g. Bakta, BUSCO, etc.)
+├── workflow/                # Snakemake rules
+├── scripts/                 # Helper scripts (see below)
+└── results/                 # Output directory (auto-created)
+```
+
+---
+
+## 🛠️ Configuration
+
+Edit `config.yaml` to adjust:
+
+- Input mode: `samples: "config/samples_set1.tsv"` or `samples_set2.tsv`
+- Read type: `short_reads` and `long_reads` (boolean)
+- Enable/disable tools: `run_mlst`, `run_resistance`, etc.
+- Paths to reference databases: `bakta_db_path`, `busco_db_path`, ...
+
+---
+
+## 🧾 Creating Sample Sheets
+
+Use the script [`scripts/make_sample_tsv.py`](scripts/make_sample_tsv.py) to automatically generate TSV files for your datasets.
+
+Run:
+
+```bash
+python scripts/make_sample_tsv.py
+```
+
+This generates:
+
+- `config/samples_set1.tsv` for samples with 3 files (fq1, fq2, fq3)
+- `config/samples_set2.tsv` for short-read-only samples
+
+Use can customize for your own dataset, by placing your data folder in the `data` directory, and edit the path and variables using the above python script as template.
+
+---
+
+## 🚀 How to Run the Pipeline
+
+1. **Navigate to project root directory** (one level above `workflow/`):
+
+```bash
+cd path/to/project/
+```
+
+2. **Dry-run to check for errors:**
+
+```bash
+snakemake --use-conda --cores 16 -n
+```
+
+3. **Execute workflow:**
+
+```bash
+snakemake --use-conda --cores 16
+```
+
+(You can change `--cores` as needed.)
+
+---
+
+## 🧪 Available Scripts
+
+Located in the [`scripts/`](scripts/) folder:
+
+| Script                              | Description |
+|-------------------------------------|-------------|
+| `make_sample_tsv.py`               | Generates TSV sample sheets for Set1/Set2 automatically. |
+| `change_assembly_name.py`          | Renames annotation files (e.g., `assembly.gff3 → sample.gff3`) for compatibility. |
+| `change_assembly_name_fasta.py`    | Renames Unicycler output `assembly.fasta` to `{sample}.fasta`. |
+| `check_invalid_genes.py`           | Validates gene annotations and flags issues. |
+| `filter_transl_except.py`          | Filters translated proteins with specific conditions. |
+| `aggregate_reports.py`             | Collects and combines report outputs (under development). |
+
+---
+
+## 📚 Notes
+
+- **Blacklist**: Optional. If you want to exclude samples, create `config/sample_blacklist.tsv` with a `sample` column.
+- If `long_reads: false`, the pipeline will skip long-read steps (e.g., Unicycler `-l`, NanoPlot QC).
+- BUSCO/Bakta DBs will be auto-downloaded if `*_db_download: true`.

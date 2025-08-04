@@ -8,21 +8,21 @@ import pandas as pd
 configfile: "config/config.yaml"
 samples = pd.read_csv(config["samples"], index_col = "sample", sep ='\t') # choose set 1 or 2 here
 
-# def get_included_samples():
+def get_included_samples():
 
-#     all_samples = samples.index.tolist()
-#     blacklist_file = config.get("blacklist_file", None)
+    all_samples = samples.index.tolist()
+    blacklist_file = config.get("blacklist_file", None)
 
-#     if blacklist_file:
-#         try:
-#             blacklist = pd.read_csv(blacklist_file, header=None)[0].tolist()
-#         except Exception:
-#             print("Warning: Could not read blacklist file. Using all samples.")
-#             blacklist = []
-#     else:
-#         blacklist = []
+    if blacklist_file:
+        try:
+            blacklist = pd.read_csv(blacklist_file, header=None)[0].tolist()
+        except Exception:
+            print("Warning: Could not read blacklist file. Using all samples.")
+            blacklist = []
+    else:
+        blacklist = []
 
-#     return [s for s in all_samples if s not in blacklist]
+    return [s for s in all_samples if s not in blacklist]
 
 # set1 = bool(config["samples"] == "config/samples_set1.tsv")
 
@@ -39,6 +39,8 @@ samples = pd.read_csv(config["samples"], index_col = "sample", sep ='\t') # choo
 #     final_output.extend(
 #     )
 
+# samples = get_included_samples()  # Get the list of samples excluding blacklisted ones
+
 set1 = bool(config["samples"] == "config/samples_set1.tsv")
 
 def get_preprocessed_reads(sample):
@@ -53,6 +55,7 @@ def get_preprocessed_reads(sample):
 final_output = []
 if set1:
     final_output.append(f"{config['output_dir_path']}/qc/multiqc_report.html")
+    final_output.extend(expand(f"{config['output_dir_path']}/assembly/{{sample}}/{{sample}}.fasta", sample=get_included_samples()))
     final_output.append(f"{config['output_dir_path']}/qc/multiqc_assembly_report.html") #multiqc on assembly (quast+busco)
     final_output.append(f"{config['output_dir_path']}/pangenome/panaroo")
     # Optionally add Bakta DB download target if enabled
@@ -64,26 +67,29 @@ if set1:
     if config.get("busco_db_download", False):
         final_output.append(f"{config['busco_db_path']}/.downloaded")
     
-    final_output.extend([get_preprocessed_reads(sample) for sample in samples.index])
+    final_output.extend([get_preprocessed_reads(sample) for sample in get_included_samples()])
     final_output.append(f"{config['output_dir_path']}/phylogeny/panaroo_tree.png")
 
     # 4 steps to add after iqtree (4 database downloads)
 
     if config.get("run_mlst", False):
         # final_output.append(f"{config['mlst_db_path']}/.downloaded")
-        final_output.extend(expand(f"{config['output_dir_path']}/mlst/{{sample}}.tsv",sample=samples.index))
+        final_output.extend(expand(f"{config['output_dir_path']}/mlst/{{sample}}.tsv",sample=get_included_samples()))
 
     if config.get("run_resistance", False) and config.get("abricate_db_path_card", ""):
         final_output.append(f"{config['abricate_db_path_card']}/card/.downloaded")
-        final_output.extend(expand(f"{config['output_dir_path']}/abricate/card/{{sample}}.tsv", sample=samples.index))
+        final_output.extend(expand(f"{config['output_dir_path']}/abricate/card/{{sample}}.tsv", sample=get_included_samples()))
 
     if config.get("run_virulence", False) and config.get("abricate_db_path_vfdb", ""):
         final_output.append(f"{config['abricate_db_path_vfdb']}/vfdb/.downloaded")
-        final_output.extend(expand(f"{config['output_dir_path']}/abricate/vfdb/{{sample}}.tsv", sample=samples.index))
+        final_output.extend(expand(f"{config['output_dir_path']}/abricate/vfdb/{{sample}}.tsv", sample=get_included_samples()))
 
-    if config.get("run_plasmid", False) and config.get("mob_suite_db_path", ""):
-        final_output.append(config["mob_suite_db_path"])
-        final_output.extend(expand(f"{config['output_dir_path']}/plasmids/{{sample}}", sample=samples.index))
+    # if config.get("run_plasmid", False) and config.get("mob_suite_db_path", ""):
+    #     final_output.append(config["mob_suite_db_path"])
+    #     final_output.extend(expand(f"{config['output_dir_path']}/plasmids/{{sample}}", sample=samples.index))
+    # if config.get("run_plasmidfinder", False) and config.get("plasmidfinder_db_path", ""):
+    #     final_output.append(config["plasmidfinder_db_path"])
+    #     final_output.extend(expand(f"{config['output_dir_path']}/plasmidfinder/{{sample}}", sample=get_included_samples()))
     #ADD FINAL AGGREGATE REPORTS
     #final_output.append(f"{config['output_dir_path']}/summary/combined_report.xlsx")
 

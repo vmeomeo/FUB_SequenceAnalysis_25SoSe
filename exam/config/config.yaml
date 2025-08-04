@@ -7,7 +7,9 @@ create_input_tsv: false
 fastp_flags: "--detect_adapter_for_pe --thread 4 --qualified_quality_phred 15 --length_required 50" # personalize, other:  --cut_front --cut_tail --cut_window_size 4 --cut_mean_quality 20
 
 samples: "config/samples_set1.tsv" # or "config/samples_set2.tsv"
-blacklist_file: "config/blacklist.tsv"
+short_reads: true
+long_reads: true
+blacklist_file: "config/sample_blacklist.tsv" # optional, if you want to exclude some samples from the analysis. User edited file.
 kraken_db: "data/kraken2_db"
 contaminant_fasta: "resources/contaminants.fasta"
 
@@ -22,13 +24,17 @@ bacteria_odb10: "bacteria_odb10"
 run_mlst: true
 run_resistance: true
 run_virulence: true
-run_plasmid: true
+# run_plasmid: true
+run_plasmidfinder: true
 
-mlst_db_path: "" #resources/mlst_db
+mlst_db_path: "" # empty for default database, or manually install to "resources/mlst_db"
 mlst_scheme: "klebsiella" # can change based on your data (e.g., "salmonella", "e_coli", etc.)
 abricate_db_path_card: "resources/abricate_db"
 abricate_db_path_vfdb: "resources/abricate_db"
-mob_suite_db_path: "resources/mob_suite_db"
+# mob_suite_db_path: "resources/mob_suite_db"
+plasmidfinder_db_path: "resources/plasmidfinder_db"
+
+
 
 
 

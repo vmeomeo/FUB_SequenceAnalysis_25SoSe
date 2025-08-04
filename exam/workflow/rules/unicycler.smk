@@ -1,70 +1,3 @@
-# rule unicycler_short:
-#     # input:
-#     #     r1 = f"{config['output_dir_path']}/cleaned/{{sample}}_r1.fastq.gz",
-#     #     r2 = f"{config['output_dir_path']}/cleaned/{{sample}}_r2.fastq.gz"
-#     input:
-#         r1 = lambda wc: (
-#             f"{config['output_dir_path']}/decontaminated/{wc.sample}_r1.fastq.gz"
-#             if config.get("contaminant_fasta", "")
-#             else f"{config['output_dir_path']}/cleaned/{wc.sample}_r1.fastq.gz"
-#         ),
-#         r2 = lambda wc: (
-#             f"{config['output_dir_path']}/decontaminated/{wc.sample}_r2.fastq.gz"
-#             if config.get("contaminant_fasta", "")
-#             else f"{config['output_dir_path']}/cleaned/{wc.sample}_r2.fastq.gz"
-#         )
-#     output:
-#         f"{config['output_dir_path']}/assembly/{{sample}}/assembly_1.fasta"
-#     log:
-#         f"{config['output_dir_path']}/logs/unicycler/{{sample}}.log"
-#     threads: workflow.cores
-#     conda:
-#         "../env/unicycler.yaml"
-#     params:
-#         outdir = config['output_dir_path']
-#     shell:
-#         "unicycler -1 {input.r1} -2 {input.r2} -o {params.outdir}/assembly/{wildcards.sample} "
-#         "-t {threads} &> {log}"
-
-# rule unicycler:
-#     input:
-#         r1 = lambda wc: (
-#             f"{config['output_dir_path']}/decontaminated/{wc.sample}_r1.fastq"
-#             if config.get("contaminant_fasta", "")
-#             else f"{config['output_dir_path']}/cleaned/{wc.sample}_r1.fastq.gz"
-#         ),
-#         r2 = lambda wc: (
-#             f"{config['output_dir_path']}/decontaminated/{wc.sample}_r2.fastq"
-#             if config.get("contaminant_fasta", "")
-#             else f"{config['output_dir_path']}/cleaned/{wc.sample}_r2.fastq.gz"
-#         ),
-#         l = lambda wc: (f"{config['output_dir_path']}/filtered/{wc.sample}_filtered.fastq")
-#         # assembly_short = f"{config['output_dir_path']}/assembly/{{sample}}/assembly_1.fasta"
-#     output:
-#         f"{config['output_dir_path']}/assembly/{{sample}}/assembly.fasta"
-#     log:
-#         f"{config['output_dir_path']}/logs/unicycler/{{sample}}.log"
-#     threads: workflow.cores
-#     conda:
-#         "../env/unicycler.yaml"
-#     params:
-#         outdir = config['output_dir_path']
-#     shell:
-#         "unicycler -1 {input.r1} -2 {input.r2} -l {input.l} "
-#         "-o {params.outdir}/assembly/{wildcards.sample} "
-#         "-t {threads} &> {log}"
-        
-#         # "unicycler -1 {input.r1} -2 {input.r2} -l {input.l} -o {params.outdir}/assembly/{wildcards.sample} "
-#         # "-t {threads} &> {log}"
-
-# rule change_assembly_name_unicycler:
-#     input:
-#         assembly = f"{config['output_dir_path']}/assembly/{{sample}}/assembly.fasta"
-#     output:
-#         assembly = f"{config['output_dir_path']}/assembly/{{sample}}/{{sample}}.fasta"
-#     script:
-#         "../scripts/change_assembly_name_fasta.py"
-
 rule unicycler:
     input:
         r1 = lambda wc: (
@@ -77,8 +10,10 @@ rule unicycler:
             if config.get("contaminant_fasta", "")
             else f"{config['output_dir_path']}/cleaned/{wc.sample}_r2.fastq.gz"
         ),
-        l = lambda wc: (f"{config['output_dir_path']}/filtered/{wc.sample}_filtered.fastq")
-        # assembly_short = f"{config['output_dir_path']}/assembly/{{sample}}/assembly_1.fasta"
+        l = lambda wc: (
+            f"{config['output_dir_path']}/filtered/{wc.sample}_filtered.fastq"
+            if config.get("long_reads", False) else None
+        )
     output:
         f"{config['output_dir_path']}/assembly/{{sample}}/{{sample}}.fasta"
     log:
@@ -91,7 +26,8 @@ rule unicycler:
     shell:
         """
         mkdir -p {params.outdir}/assembly/{wildcards.sample}/temp
-        unicycler -1 {input.r1} -2 {input.r2} -l {input.l} \
+        unicycler -1 {input.r1} -2 {input.r2} \
+            {"-l " + input.l if input.l else ""} \
             -o {params.outdir}/assembly/{wildcards.sample}/temp -t {threads} \
             &> {log}
         mv {params.outdir}/assembly/{wildcards.sample}/temp/assembly.fasta {output}

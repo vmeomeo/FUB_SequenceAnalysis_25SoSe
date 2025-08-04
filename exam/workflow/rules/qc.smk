@@ -66,11 +66,14 @@ rule nanoplot:
                  --loglength --N50 > {log} 2>&1
         """
 
-rule multiqc:
+rule multiqc: 
     input:
         fastp_html = expand(f"{config['output_dir_path']}/qc/{{sample}}_fastp.html", sample=samples.index),
         fastp_json = expand(f"{config['output_dir_path']}/qc/{{sample}}_fastp.json", sample=samples.index),
-        nanoplot_summaries = expand(f"{config['output_dir_path']}/qc/nanoplot/{{sample}}/NanoPlot-report.html", sample=samples.index)
+        nanoplot_summaries = lambda wildcards: (
+            expand(f"{config['output_dir_path']}/qc/nanoplot/{{sample}}/NanoPlot-report.html", sample=samples.index)
+            if config.get("long_reads", False) else []
+        )
     output:
         html = f"{config['output_dir_path']}/qc/multiqc_report.html"
     conda:

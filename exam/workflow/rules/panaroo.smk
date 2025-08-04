@@ -16,7 +16,7 @@ rule panaroo:
     input:
         # gffs = expand("results/annotation/{sample}/assembly.filtered.gff3", sample=samples.index)
         # gffs = expand(f"{config['output_dir_path']}/annotation/{{sample}}/assembly.gff3", sample=samples.index)
-        gffs = expand(f"{config['output_dir_path']}/annotation/{{sample}}/{{sample}}.gff3", sample=samples.index)
+        gffs = expand(f"{config['output_dir_path']}/annotation/{{sample}}/{{sample}}.gff3", sample=get_included_samples())
         # Test
         # gffs = expand(f"{config['output_dir_path']}/panaroo_input/{{sample}}.gff3", sample=samples.index)
     output:

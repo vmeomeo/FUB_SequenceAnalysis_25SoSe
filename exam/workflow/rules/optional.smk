@@ -46,17 +46,31 @@ rule download_abricate_vfdb_db:
         touch {output}
         """
 
-rule download_mob_suite_db:
+# rule download_mob_suite_db:
+#     output:
+#         directory(config["mob_suite_db_path"])
+#     log:
+#         f"{config['output_dir_path']}/logs/mob_suite/download_mob_suite_db.log"
+#     conda:
+#         "../env/mob_suite.yaml"
+#     shell:
+#         """
+#         mob_init --outdir {output} > {log} 2>&1
+#         """
+
+rule download_plasmidfinder_db:
     output:
-        directory(config["mob_suite_db_path"])
+        directory(config["plasmidfinder_db_path"])
     log:
-        f"{config['output_dir_path']}/logs/mob_suite/download_mob_suite_db.log"
+        f"{config['output_dir_path']}/logs/plasmidfinder/download_db.log"
     conda:
-        "../env/mob_suite.yaml"
+        "../env/plasmidfinder.yaml"
     shell:
         """
-        mob_init --outdir {output} > {log} 2>&1
+        plasmidfinder.py --download -o {output} > {log} 2>&1
         """
+
+
 
 # rule mlst:
 #     input:
@@ -123,20 +137,37 @@ rule abricate_vfdb:
         abricate --db vfdb {input.fasta} > {output.tsv} 2> {log}
         """
 
-rule mob_suite:
+# rule mob_suite:
+#     input:
+#         fasta = f"{config['output_dir_path']}/assembly/{{sample}}/{{sample}}.fasta",
+#         db_dir = config["mob_suite_db_path"]
+#     output:
+#         directory(f"{config['output_dir_path']}/plasmids/{{sample}}")
+#     log:
+#         f"{config['output_dir_path']}/plasmids/{{sample}}/mob_recon.log"
+#     conda:
+#         "../env/mob_suite.yaml"
+#     shell:
+#         """
+#         mob_recon -u --infile {input.fasta} --outdir {output} --db {input.db_dir} > {log} 2>&1
+#         """
+
+rule plasmidfinder:
     input:
         fasta = f"{config['output_dir_path']}/assembly/{{sample}}/{{sample}}.fasta",
-        db_dir = config["mob_suite_db_path"]
+        db = config["plasmidfinder_db_path"]
     output:
-        directory(f"{config['output_dir_path']}/plasmids/{{sample}}")
+        result_dir = directory(f"{config['output_dir_path']}/plasmidfinder/{{sample}}")
     log:
-        f"{config['output_dir_path']}/plasmids/{{sample}}/mob_recon.log"
+        f"{config['output_dir_path']}/plasmidfinder/{{sample}}/plasmidfinder.log"
     conda:
-        "../env/mob_suite.yaml"
+        "../env/plasmidfinder.yaml"
     shell:
         """
-        mob_recon -u --infile {input.fasta} --outdir {output} --db {input.db_dir} > {log} 2>&1
+        plasmidfinder.py -i {input.fasta} -o {output.result_dir} -p {input.db} > {log} 2>&1
         """
+
+
 
 def get_aggregate_inputs():
     inputs = {}
@@ -146,7 +177,7 @@ def get_aggregate_inputs():
         inputs["card"] = expand(f"{config['output_dir_path']}/abricate/card/{{sample}}.tsv", sample=samples.index)
     if config.get("run_virulence", False) and config.get("abricate_db_path_vfdb", ""):
         inputs["vfdb"] = expand(f"{config['output_dir_path']}/abricate/vfdb/{{sample}}.tsv", sample=samples.index)
-    if config.get("run_plasmid", False) and config.get("mob_suite_db_path", ""):
+    if config.get("run_plasmidfinder", False) and config.get("plasmidfinder_db_path", ""):
         inputs["mob"] = expand(f"{config['output_dir_path']}/plasmids/{{sample}}/mobtyper_results.txt", sample=samples.index)
     return inputs
 

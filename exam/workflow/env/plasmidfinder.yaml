@@ -1,0 +1,8 @@
+name: plasmidfinder
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - plasmidfinder
+  - blast
+  - python >=3.7,<3.10
