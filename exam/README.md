@@ -23,10 +23,12 @@ project/
 ├── data/
 │   ├── SET1/                  # Contains raw FASTQ files for Set 1
 │   └── SET2/                  # Contains raw FASTQ files for Set 2
-├── resources/                # Databases (e.g. Bakta, BUSCO, etc.)
-├── workflow/                # Snakemake rules
-├── scripts/                 # Helper scripts (see below)
-└── results/                 # Output directory (auto-created)
+├── resources/                 # Databases (e.g. Bakta, BUSCO, etc.)
+├── workflow/                  # Snakemake rules
+│   ├── scripts/               # Helper scripts (see below)
+│   └── SET2/                  # Contains raw FASTQ files for Set 2
+├── results/                   # Output directory (auto-created)
+└── README.md                  # Tutorial on how to use this workflow
 ```
 
 ---
