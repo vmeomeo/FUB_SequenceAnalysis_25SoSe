@@ -24,23 +24,6 @@ def get_included_samples():
 
     return [s for s in all_samples if s not in blacklist]
 
-# set1 = bool(config["samples"] == "config/samples_set1.tsv")
-
-# final_output = []
-# if set1: # if the config has set 1
-#     final_output.append(f"{config['output_dir_path']}/qc/multiqc_report.html")
-#     # final_output.append(f"{config['output_dir_path']}/qc/nanoplot/sample1")
-#     # final_output.append(f"{config['output_dir_path']}/cleaned/sample1_porechop.fastq") # long reads porechop
-#     # final_output.append(f"{config['output_dir_path']}/filtered/sample1_filtered.fastq") # nanofilt
-#     # final_output.append(f"{config['output_dir_path']}/qc/nanoplot/sample1/NanoPlot-report.html") # nanoplot
-#     final_output.extend(expand(f"{config['output_dir_path']}/cleaned/{{sample}}_r1.fastq.gz", sample=samples.index))
-#      # short reads fastp
-# else: #do the set 2 steps
-#     final_output.extend(
-#     )
-
-# samples = get_included_samples()  # Get the list of samples excluding blacklisted ones
-
 set1 = bool(config["samples"] == "config/samples_set1.tsv")
 
 def get_preprocessed_reads(sample):
@@ -53,7 +36,7 @@ def get_preprocessed_reads(sample):
     ]
 # Conditional final outputs
 final_output = []
-if set1:
+if set1: #TESTED UNTIL PLASMIDFINDER
     final_output.append(f"{config['output_dir_path']}/qc/multiqc_report.html")
     final_output.extend(expand(f"{config['output_dir_path']}/assembly/{{sample}}/{{sample}}.fasta", sample=get_included_samples()))
     final_output.append(f"{config['output_dir_path']}/qc/multiqc_assembly_report.html") #multiqc on assembly (quast+busco)
@@ -70,32 +53,27 @@ if set1:
     final_output.extend([get_preprocessed_reads(sample) for sample in get_included_samples()])
     final_output.append(f"{config['output_dir_path']}/phylogeny/panaroo_tree.png")
 
-    # 4 steps to add after iqtree (4 database downloads)
+    # final aggregate of optional reports
+    final_output.append(f"{config['output_dir_path']}/summary/combined_report.xlsx")
 
-    if config.get("run_mlst", False):
-        # final_output.append(f"{config['mlst_db_path']}/.downloaded")
-        final_output.extend(expand(f"{config['output_dir_path']}/mlst/{{sample}}.tsv",sample=get_included_samples()))
-
-    if config.get("run_resistance", False) and config.get("abricate_db_path_card", ""):
-        final_output.append(f"{config['abricate_db_path_card']}/card/.downloaded")
-        final_output.extend(expand(f"{config['output_dir_path']}/abricate/card/{{sample}}.tsv", sample=get_included_samples()))
-
-    if config.get("run_virulence", False) and config.get("abricate_db_path_vfdb", ""):
-        final_output.append(f"{config['abricate_db_path_vfdb']}/vfdb/.downloaded")
-        final_output.extend(expand(f"{config['output_dir_path']}/abricate/vfdb/{{sample}}.tsv", sample=get_included_samples()))
-
-    # if config.get("run_plasmid", False) and config.get("mob_suite_db_path", ""):
-    #     final_output.append(config["mob_suite_db_path"])
-    #     final_output.extend(expand(f"{config['output_dir_path']}/plasmids/{{sample}}", sample=samples.index))
-    # if config.get("run_plasmidfinder", False) and config.get("plasmidfinder_db_path", ""):
-    #     final_output.append(config["plasmidfinder_db_path"])
-    #     final_output.extend(expand(f"{config['output_dir_path']}/plasmidfinder/{{sample}}", sample=get_included_samples()))
-    #ADD FINAL AGGREGATE REPORTS
-    #final_output.append(f"{config['output_dir_path']}/summary/combined_report.xlsx")
-
-else:
-    final_output.extend(
-    )
+else: #UNTESTED YET, NEED TO MODIFY THE RULES TO TEST
+    # Basic QC outputs 
+    final_output.append(f"{config['output_dir_path']}/qc/multiqc_report.html")
+    
+    # Assembly outputs 
+    final_output.extend(expand(f"{config['output_dir_path']}/assembly/{{sample}}/{{sample}}.fasta", 
+                            sample=get_included_samples()))
+    final_output.append(f"{config['output_dir_path']}/qc/multiqc_assembly_report.html")
+    
+    # Keep pangenome and phylogeny
+    final_output.append(f"{config['output_dir_path']}/pangenome/panaroo")
+    final_output.append(f"{config['output_dir_path']}/phylogeny/panaroo_tree.png")
+    
+    # Preprocessed reads
+    final_output.extend([get_preprocessed_reads(sample) for sample in get_included_samples()])
+    
+    # Final report
+    final_output.append(f"{config['output_dir_path']}/summary/combined_report.xlsx")
 
 
 rule all:

@@ -25,7 +25,7 @@ run_mlst: true
 run_resistance: true
 run_virulence: true
 # run_plasmid: true
-run_plasmidfinder: true
+run_plasmidfinder: false
 
 mlst_db_path: "" # empty for default database, or manually install to "resources/mlst_db"
 mlst_scheme: "klebsiella" # can change based on your data (e.g., "salmonella", "e_coli", etc.)

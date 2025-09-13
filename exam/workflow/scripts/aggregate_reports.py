@@ -1,36 +1,42 @@
 import pandas as pd
-import os
+from pathlib import Path
+import sys
 
-log_file = open(snakemake.log[0], "w")
+def process_inputs(input_files, output_xlsx):
+    writer = pd.ExcelWriter(output_xlsx, engine='openpyxl')
+    
+    # Group files by type
+    file_groups = {}
+    for f in input_files:
+        path = Path(f)
+        if 'mlst' in str(path):
+            file_groups.setdefault('mlst', []).append(f)
+        elif 'card' in str(path):
+            file_groups.setdefault('card', []).append(f)
+        elif 'vfdb' in str(path):
+            file_groups.setdefault('vfdb', []).append(f)
+        elif 'plasmids' in str(path):
+            file_groups.setdefault('mob', []).append(f)
+    
+    # Process each group
+    for sheet_name, files in file_groups.items():
+        dfs = []
+        for f in files:
+            try:
+                df = pd.read_csv(f, sep='\t')
+                sample = Path(f).stem.split('.')[0]
+                df['Sample'] = sample  # Add sample identifier
+                dfs.append(df)
+            except Exception as e:
+                print(f"Error processing {f}: {e}", file=sys.stderr)
+        
+        if dfs:
+            pd.concat(dfs).to_excel(writer, sheet_name=sheet_name[:31], index=False)
+    
+    writer.close()
 
-def concat_tables(files, source):
-    dfs = []
-    for file in files:
-        try:
-            df = pd.read_csv(file, sep="\t")
-            df.insert(0, "Sample", os.path.basename(file).split(".")[0])
-            dfs.append(df)
-        except Exception as e:
-            print(f"Error reading {file}: {e}", file=log_file)
-    if dfs:
-        combined = pd.concat(dfs, ignore_index=True)
-        return combined
-    else:
-        return pd.DataFrame()
-
-with pd.ExcelWriter(snakemake.output.summary) as writer:
-    if "mlst" in snakemake.input:
-        mlst_df = concat_tables(snakemake.input.mlst, "mlst")
-        mlst_df.to_excel(writer, sheet_name="MLST", index=False)
-
-    if "card" in snakemake.input:
-        card_df = concat_tables(snakemake.input.card, "card")
-        card_df.to_excel(writer, sheet_name="Resistance_CARD", index=False)
-
-    if "vfdb" in snakemake.input:
-        vfdb_df = concat_tables(snakemake.input.vfdb, "vfdb")
-        vfdb_df.to_excel(writer, sheet_name="Virulence_VFDB", index=False)
-
-    if "mob" in snakemake.input:
-        mob_df = concat_tables(snakemake.input.mob, "mob")
-        mob_df.to_excel(writer, sheet_name="Plasmids", index=False)
+if __name__ == '__main__':
+    input_files = snakemake.input  # List of all input files
+    output_xlsx = snakemake.output.summary
+    Path(output_xlsx).parent.mkdir(parents=True, exist_ok=True)
+    process_inputs(input_files, output_xlsx)

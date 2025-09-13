@@ -1,8 +1,6 @@
 rule iqtree:
     input:
         alignment = f"{config['output_dir_path']}/pangenome/panaroo/core_gene_alignment.aln"
-        # Test
-        # alignment = f"{config['output_dir_path']}/pangenome/panaroo_test/core_gene_alignment.aln"
     output:
         treefile = f"{config['output_dir_path']}/phylogeny/panaroo_tree.treefile"
     threads: workflow.cores
@@ -14,11 +12,22 @@ rule iqtree:
         prefix = f"{config['output_dir_path']}/phylogeny/panaroo_tree"
     shell:
         """
-        iqtree2 -s {input.alignment} \
-                -nt {threads} \
-                -pre {params.prefix} \
-                -m MFP \
-                -B 1000 > {log} 2>&1
+        # Check if alignment has at least 4 sequences
+        NUM_SEQS=$(grep -c '^>' {input.alignment} || wc -l < {input.alignment})
+        if [ "$NUM_SEQS" -lt 4 ]; then
+            echo "WARNING: Only $NUM_SEQS sequences detected. Skipping bootstrapping." > {log}
+            iqtree2 -s {input.alignment} \
+                    -nt {threads} \
+                    -pre {params.prefix} \
+                    -m MFP \
+                    -n 0  # Disable bootstrapping for small datasets >> {log} 2>&1
+        else
+            iqtree2 -s {input.alignment} \
+                    -nt {threads} \
+                    -pre {params.prefix} \
+                    -m MFP \
+                    -B 1000 >> {log} 2>&1
+        fi
         """
 
 rule visualize_tree:

@@ -40,6 +40,8 @@ rule busco:
     output:
         summary = f"{config['output_dir_path']}/qc/busco/{{sample}}/{{sample}}/short_summary.specific.bacteria_odb10.{{sample}}.txt",
         busco_dirs = directory(f"{config['output_dir_path']}/qc/busco/{{sample}}/{{sample}}")
+    log:
+        f"{config['output_dir_path']}/qc/busco/logs/{{sample}}.log"
     conda:
         "../env/busco.yaml"
     params:
@@ -55,17 +57,14 @@ rule busco:
               -m genome \
               -f \
               --out_path {params.outdir}/qc/busco/{wildcards.sample} \
-              --cpu {threads}
+              --cpu {threads} > {log} 2>&1
         """
+
 
 
 rule assembly_multiqc:
     input:
         quast_dirs = expand(f"{config['output_dir_path']}/qc/quast/{{sample}}", sample=get_included_samples()),
-        # busco_summaries = expand(
-        #     f"{config['output_dir_path']}/qc/busco/{{sample}}/{{sample}}/short_summary.specific.bacteria_odb10.{{sample}}.txt",
-        #     sample=samples.index
-        # )
         busco_dirs = expand(
             f"{config['output_dir_path']}/qc/busco/{{sample}}/{{sample}}", sample=get_included_samples()
         )
@@ -82,7 +81,3 @@ rule assembly_multiqc:
         """
         multiqc {input.quast_dirs} {input.busco_dirs} -o {params.outdir} -n multiqc_assembly_report > {log} 2>&1
         """
-        
-        # rm -f {params.outdir}/multiqc_assembly_report*.html
-        # multiqc {input.quast_dirs} {input.busco_summaries} -o {params.outdir} -n multiqc_assembly_report > {log} 2>&1
-        # """

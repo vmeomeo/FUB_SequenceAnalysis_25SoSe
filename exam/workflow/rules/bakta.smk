@@ -28,11 +28,4 @@ rule bakta:
         "--output {params.outdir}/annotation/{wildcards.sample} "
         "--threads {threads} --force &> \"{log}\""
 
-# rule change_assembly_name_bakta:
-#     input:
-#         assembly = f"{config['output_dir_path']}/annotation/{{sample}}/assembly.gff3"
-#     output:
-#         assembly = f"{config['output_dir_path']}/annotation/{{sample}}/{{sample}}.gff3"
-#     script:
-#         "../scripts/change_assembly_name.py"
 

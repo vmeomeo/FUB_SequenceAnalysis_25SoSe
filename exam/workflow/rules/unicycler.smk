@@ -1,19 +1,22 @@
+def get_short_read1(wildcards):
+    if config.get("contaminant_fasta", ""):
+        return f"{config['output_dir_path']}/decontaminated/{wildcards.sample}_r1.fastq"
+    return f"{config['output_dir_path']}/cleaned/{wildcards.sample}_r1.fastq.gz"
+
+def get_short_read2(wildcards):
+    if config.get("contaminant_fasta", ""):
+        return f"{config['output_dir_path']}/decontaminated/{wildcards.sample}_r2.fastq"
+    return f"{config['output_dir_path']}/cleaned/{wildcards.sample}_r2.fastq.gz"
+
+def get_long_read(wildcards):
+    if config.get("long_reads", False):
+        return f"{config['output_dir_path']}/filtered/{wildcards.sample}_filtered.fastq"
+    return None  # Explicitly return None if no long reads
 rule unicycler:
     input:
-        r1 = lambda wc: (
-            f"{config['output_dir_path']}/decontaminated/{wc.sample}_r1.fastq"
-            if config.get("contaminant_fasta", "")
-            else f"{config['output_dir_path']}/cleaned/{wc.sample}_r1.fastq.gz"
-        ),
-        r2 = lambda wc: (
-            f"{config['output_dir_path']}/decontaminated/{wc.sample}_r2.fastq"
-            if config.get("contaminant_fasta", "")
-            else f"{config['output_dir_path']}/cleaned/{wc.sample}_r2.fastq.gz"
-        ),
-        l = lambda wc: (
-            f"{config['output_dir_path']}/filtered/{wc.sample}_filtered.fastq"
-            if config.get("long_reads", False) else None
-        )
+        r1 = get_short_read1,
+        r2 = get_short_read2,
+        l = get_long_read,
     output:
         f"{config['output_dir_path']}/assembly/{{sample}}/{{sample}}.fasta"
     log:
@@ -27,7 +30,7 @@ rule unicycler:
         """
         mkdir -p {params.outdir}/assembly/{wildcards.sample}/temp
         unicycler -1 {input.r1} -2 {input.r2} \
-            {"-l " + input.l if input.l else ""} \
+            -l {input.l} \
             -o {params.outdir}/assembly/{wildcards.sample}/temp -t {threads} \
             &> {log}
         mv {params.outdir}/assembly/{wildcards.sample}/temp/assembly.fasta {output}

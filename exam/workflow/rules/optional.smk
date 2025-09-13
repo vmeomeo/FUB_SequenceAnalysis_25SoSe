@@ -4,19 +4,6 @@ mlst_db = string.split(" ")
 if config['mlst_scheme'] not in mlst_db:
     raise ValueError(f"MLST scheme '{config['mlst_scheme']}' not found in the default database. Please provide a valid scheme or find the data for your organism on https://pubmlst.org/. You can use the 'mlst_db_path' in the config to point to a custom database. If not provided, the default database will be used. If no data is available for your organism, you can set 'run_mlst' to false in the config file to skip this step.")
 
-# rule download_mlst_db:
-#     output:
-#         touch(f"{config['mlst_db_path']}/.downloaded")
-#     log:
-#         f"{config['output_dir_path']}/logs/mlst/download_mlst_db.log"
-#     conda:
-#         "../env/mlst.yaml"
-#     shell:
-#         """
-#         # This forces database initialization if not already present
-#         mlst --check > {log} 2>&1 || true  # --check verifies DBs exist
-#         touch {output}
-#         """
 
 rule download_abricate_card_db:
     output:
@@ -100,7 +87,7 @@ rule mlst:
         "../env/mlst.yaml"
     params:
         scheme = config['mlst_scheme'],
-        db_dir = config.get('mlst_db_path', '')  # Use default if not specified
+        db_dir = config.get('mlst_db_path', '') 
     shell:
         """
         mlst --scheme "{params.scheme}" \
@@ -170,25 +157,28 @@ rule plasmidfinder:
 
 
 def get_aggregate_inputs():
-    inputs = {}
+    inputs = []
+    
+    # MLST results
     if config.get("run_mlst", False) and config.get("mlst_db_path", ""):
-        inputs["mlst"] = expand(f"{config['output_dir_path']}/mlst/{{sample}}.tsv", sample=samples.index)
+        inputs.extend(expand(f"{config['output_dir_path']}/mlst/{{sample}}.tsv", sample=get_included_samples()))
+    
+    # CARD resistance genes
     if config.get("run_resistance", False) and config.get("abricate_db_path_card", ""):
-        inputs["card"] = expand(f"{config['output_dir_path']}/abricate/card/{{sample}}.tsv", sample=samples.index)
+        inputs.extend(expand(f"{config['output_dir_path']}/abricate/card/{{sample}}.tsv", sample=get_included_samples()))
+    
+    # VFDB virulence factors
     if config.get("run_virulence", False) and config.get("abricate_db_path_vfdb", ""):
-        inputs["vfdb"] = expand(f"{config['output_dir_path']}/abricate/vfdb/{{sample}}.tsv", sample=samples.index)
+        inputs.extend(expand(f"{config['output_dir_path']}/abricate/vfdb/{{sample}}.tsv", sample=get_included_samples()))
+    
+    # PlasmidFinder results
     if config.get("run_plasmidfinder", False) and config.get("plasmidfinder_db_path", ""):
-        inputs["mob"] = expand(f"{config['output_dir_path']}/plasmids/{{sample}}/mobtyper_results.txt", sample=samples.index)
+        inputs.extend(directory(expand(f"{config['output_dir_path']}/plasmidfinder/{{sample}}", sample=get_included_samples())))
+    
     return inputs
-
 
 rule aggregate_reports:
     input:
-        # add conditions
-        # mlst = expand(f"{config['output_dir_path']}/mlst/{{sample}}.tsv", sample=samples.index),
-        # card = expand(f"{config['output_dir_path']}/abricate/card/{{sample}}.tsv", sample=samples.index),
-        # vfdb = expand(f"{config['output_dir_path']}/abricate/vfdb/{{sample}}.tsv", sample=samples.index),
-        # mob  = expand(f"{config['output_dir_path']}/plasmids/{{sample}}/mobtyper_results.txt", sample=samples.index)
         get_aggregate_inputs()
     output:
         summary = f"{config['output_dir_path']}/summary/combined_report.xlsx"
@@ -198,4 +188,3 @@ rule aggregate_reports:
         f"{config['output_dir_path']}/summary/aggregate_reports.log"
     script:
         "workflow/scripts/aggregate_reports.py"
-
